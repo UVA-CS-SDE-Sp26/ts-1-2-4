@@ -1,0 +1,46 @@
+File Handler Plan (Member B)
+
+Responsibility
+- Own all direct file system access for data files.
+- Provide program control a clean API: list available files and return file contents by index or name.
+- Keep data folder location flexible (project root /data or same dir as program /data).
+
+Data layout
+- data/ contains mission files (plain or ciphered text).
+- ciphers/ contains key.txt (handled by cipher module, not here).
+
+Interface
+- class FileCatalog
+  - List<FileEntry> listFiles()
+  - Optional<FileEntry> getByIndex(int index)
+  - Optional<FileEntry> getByName(String filename)
+- class FileEntry
+  - int index
+  - String filename
+  - Path path
+- class FileReaderService
+  - String readFile(Path path) throws IOException
+
+Behavior
+- On startup, resolve data directory:
+  1) ./data (project root)
+  2) ./build/../data if running from build (fallback)
+  3) working-dir/data (same folder as program)
+- listFiles() returns sorted filenames (case-insensitive) with 1-based indices.
+- getByIndex() maps user number to the sorted list.
+- readFile() returns raw file contents (no decipher here).
+
+Error handling
+- If data directory missing or empty, return empty list and a descriptive error to program control.
+- If file cannot be read, throw or return error message for program control to show.
+
+Notes for integration
+- Program control should call listFiles() when no args.
+- Program control should call getByIndex() then readFile().
+- Cipher module (Team D) should be invoked only after readFile() returns raw content.
+
+Testing ideas
+- listFiles() on empty data dir returns empty list.
+- listFiles() returns sorted order and 1-based indices.
+- getByIndex() with invalid index returns empty.
+- readFile() returns exact file contents.
