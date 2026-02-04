@@ -11,6 +11,7 @@ General rules
 - Keep lines under ~90 characters when possible.
 - Avoid long paragraphs; prefer bullets.
 - No code blocks unless necessary for syntax or examples.
+- Class names and methods must match the allowed list in docs/readme.txt.
 
 Required sections (in this order)
 1) Title

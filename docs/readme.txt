@@ -16,6 +16,29 @@ Architecture Overview
 - CipherService deciphers content when ciphering is enabled.
 - UI prints lists, file contents, or errors and exits.
 
+Core Classes And Members(Instance Variables and Methods)
+- TopSecretApp
+  - main(String[] args)
+  - ProgramController controller
+- ProgramController
+  - listFiles(): String
+  - showFile(int index, Optional<String> keyPath): String
+  - FileCatalog catalog
+  - FileReaderService reader
+  - CipherService cipher
+- FileCatalog
+  - listFiles(): List<String>
+  - getByIndex(int index): Optional<String>
+  - String dataDir
+- FileReaderService
+  - readFile(String path): String
+- CipherService
+  - loadKey(String keyPath): CipherKey
+  - decipher(String input, CipherKey key): String
+- CipherKey
+  - Map<Character, Character> mapping
+  - validate(): boolean
+
 Program Flow
 - No args: list files -> print numbered list -> exit.
 - With index: read file -> optional decipher -> print content -> exit.

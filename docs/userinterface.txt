@@ -1,58 +1,40 @@
-userinterface.txt
+User Interface Plan (Team A)
 
-Define the command line interface for the Top-secret program. This document describes valid commands, inputs, outputs, and error handling. 
+Responsibility
+- Define valid command‑line inputs and outputs.
+- Display file lists, file contents, and error messages.
+- Do not read files directly or perform deciphering.
 
+Inputs
+- CLI arguments: none, [fileNumber], or [fileNumber] [keyPath].
 
-Start of program:
-	Ask User for 
-------------------------------------------------------------
-case1: No Arguments
-------------------------------------------------------------
-	Input: null
+Outputs
+- Numbered list of available files.
+- File contents (plain or deciphered).
+- User‑friendly error messages.
 
-	Command: 
-		java topsecret
-	Output: All files ( In data folder )
-	Behavior: 
-		- Display a numbered list of all available text files.
-		- Each file on it's own line
-		- List is ordered in ascending order
-	Example Output:	
-		01 file1.txt
-		02 file2.txt
-		03 file3.txt
--------------------------------------------------------------
-case2: One Argument (File Number)
--------------------------------------------------------------
-	input: number representing specific text file
-	Output: Input number for that data file
-	Behavior:
-		- Display contents of the file corresponding to the given number.
-		- Uses default cipher key if deciphering is required
-	Example Output:
-		java topsecret 01
--------------------------------------------------------------
-case3: Two Arguments (File Number + Alternate Key)
--------------------------------------------------------------
-	input: number and alternate key
-	Output: 
-	Behavior: 
-		- Display contents of specific file
-		- Use the provided cipher key instead of default key
-	Example Output: 	
-		java topsecret 01 mykey.txt"
--------------------------------------------------------------
-Error Handling: 
--------------------------------------------------------------
-	Output: Let user know that that error has occurred. 
+Interface (proposed)
+- class TopSecretApp
+  - main(String[] args)
+  - ProgramController controller
+  
 
-	Handled errors are:
-		- Invalid file number format
-		- File number not found in list
-		- Too many command-line arguments
-		- File cannot be found
-		- File can not be deciphered 
+Behavior
+- If no args: call ProgramController.listFiles() and print result.
+- If one arg: parse file number, call ProgramController.showFile(index, empty).
+- If two args: parse number and key path, call ProgramController.showFile(index, keyPath).
+- Print output and exit.
 
-	Example:
-		Error: Invalid File Number
+Error Handling
+- If arg count invalid: print "Too many arguments".
+- If file number invalid format: print "Invalid file number".
+- If file number out of range: print "File number not found".
+- If file cannot be read: print "Unable to read file".
+- If cipher key invalid or missing: print "Invalid key".
 
+Testing Ideas (TDD)
+- No args prints a numbered list.
+- One arg prints selected file content.
+- Two args uses alternate key path.
+- Invalid number format prints error.
+- Too many args prints error.

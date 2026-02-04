@@ -25,16 +25,21 @@ Required sections (in this order)
 4) Architecture Overview
 - 4–8 bullets describing major components and how they interact.
 
-5) Program Flow
+5) Core Classes And Members(Instance Variables and Methods)
+- List each class and the key methods and instance variables.
+- Prefer primitives and common types when possible; use custom types when they clarify
+  ownership, structure, or reduce ambiguity.
+
+6) Program Flow
 - Two short flows: no‑args and args present.
 
-6) Command Usage
+7) Command Usage
 - Show the primary run commands and argument meanings.
 
-7) File/Folder Layout
+8) File/Folder Layout
 - Bullet list of required folders and key files.
 
-8) Testing Approach (TDD)
+9) Testing Approach (TDD)
 - 3–6 bullets for how testing is organized.
 
 Optional sections (use only if needed)
@@ -61,6 +66,29 @@ Architecture Overview
 - ProgramController requests file lists or contents from File Handler.
 - CipherService deciphers content when ciphering is enabled.
 - UI layer prints lists, file contents, or errors.
+
+Core Classes And Members(Instance Variables and Methods)
+- TopSecretApp
+  - main(String[] args)
+  - ProgramController controller
+- ProgramController
+  - listFiles(): String
+  - showFile(int index, Optional<String> keyPath): String
+  - FileCatalog catalog
+  - FileReaderService reader
+  - CipherService cipher
+- FileCatalog
+  - listFiles(): List<String>
+  - getByIndex(int index): Optional<String>
+  - String dataDir
+- FileReaderService
+  - readFile(String path): String
+- CipherService
+  - loadKey(String keyPath): CipherKey
+  - decipher(String input, CipherKey key): String
+- CipherKey
+  - Map<Character, Character> mapping
+  - validate(): boolean
 
 Program Flow
 - No args: list files -> print numbered list -> exit.

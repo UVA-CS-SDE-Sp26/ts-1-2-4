@@ -1,0 +1,45 @@
+Program Control Plan (Team C)
+
+Responsibility
+- Orchestrate program flow based on CLI arguments.
+- Request file lists and contents from the File Handler.
+- Pass raw content to Cipher (if enabled) and return readable output.
+- Do not access the file system directly.
+
+Inputs
+- CLI arguments: [fileNumber], [optional keyPath].
+- File list and file contents from File Handler.
+- Cipher key path or content when ciphering is enabled.
+
+Outputs
+- Numbered list of available files.
+- File contents (plain or deciphered).
+- User‑friendly error messages.
+
+Interface (proposed)
+- class ProgramController
+  - String listFiles()
+  - String showFile(int index, Optional<String> keyPath)
+  - FileCatalog catalog
+  - FileReaderService reader
+  - CipherService cipher
+
+Behavior
+- If no args: request listFiles() from File Handler and format numbered list.
+- If fileNumber provided: fetch file by index, read contents.
+- If ciphering enabled: load key (default or provided) and decipher content.
+- Return output string to UI layer for printing.
+
+Error Handling
+- If file list is empty: return "No files available".
+- If index invalid: return "Invalid file number".
+- If file read fails: return "Unable to read file".
+- If cipher key invalid or missing: return "Invalid key".
+
+Testing Ideas (TDD)
+- No args returns numbered list from File Handler.
+- Empty file list returns "No files available".
+- Invalid index returns error message.
+- Valid index returns file content.
+- Cipher enabled with valid key returns deciphered text.
+- Cipher enabled with invalid key returns error message.
