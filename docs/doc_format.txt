@@ -1,8 +1,8 @@
-Documentation Format Guide
+Documentation Format Guide (Role Docs)
 
 Purpose
-- Ensure all docs in /docs follow the same layout, tone, and level of detail.
-- Keep each doc short, scannable, and focused on responsibilities and interfaces.
+- Standardize the format for role‑specific docs in /docs (e.g., filehandler.txt).
+- Keep docs short, scannable, and focused on a single responsibility.
 
 General rules
 - Plain text only.
