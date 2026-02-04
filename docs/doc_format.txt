@@ -1,0 +1,82 @@
+Documentation Format Guide
+
+Purpose
+- Ensure all docs in /docs follow the same layout, tone, and level of detail.
+- Keep each doc short, scannable, and focused on responsibilities and interfaces.
+
+General rules
+- Plain text only.
+- Use short headings with Title Case.
+- Use dash bullets for lists.
+- Keep lines under ~90 characters when possible.
+- Avoid long paragraphs; prefer bullets.
+- No code blocks unless necessary for syntax or examples.
+
+Required sections (in this order)
+1) Title
+- One line: the document name and owner (team or role).
+
+2) Responsibility
+- 2–5 bullets describing what this part owns and does not own.
+
+3) Inputs
+- What data/commands this part receives.
+
+4) Outputs
+- What data/commands this part returns or produces.
+
+5) Interface (proposed)
+- List classes and key methods or functions.
+- Keep method signatures short and language‑agnostic.
+
+6) Behavior
+- Bullet steps for normal flow.
+
+7) Error Handling
+- Expected errors and how they surface to other parts.
+
+8) Testing Ideas (TDD)
+- 3–6 test cases written as short bullets.
+
+Optional sections (use only if needed)
+- Data Layout
+- Dependencies
+- Notes
+
+Example (for LLMs to follow)
+
+Title
+Program Control Plan (Team C)
+
+Responsibility
+- Orchestrate program flow based on CLI arguments.
+- Call File Handler to list files or fetch file contents.
+- Pass raw content to Cipher (if enabled) and return readable output.
+- Do not access the file system directly.
+
+Inputs
+- CLI arguments: [index], [optional key path].
+
+Outputs
+- Printed file list or decoded file contents.
+- User‑friendly error messages.
+
+Interface (proposed)
+- class ProgramController
+  - String listFiles()
+  - String showFile(int index, Optional<Path> keyPath)
+
+Behavior
+- If no args: list files and return numbered list.
+- If index provided: fetch file, optionally decipher, return content.
+
+Error Handling
+- If index invalid: return "Invalid file number".
+- If file read fails: return "Unable to read file".
+- If cipher key invalid: return "Invalid key".
+
+Testing Ideas (TDD)
+- No args returns a numbered list.
+- Invalid index returns error message.
+- Valid index returns file content.
+- Invalid key returns error message.
