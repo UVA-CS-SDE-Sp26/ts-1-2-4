@@ -1,6 +1,7 @@
 import java.util.Optional;
+import interfaces.ProgramControllerInterface;
 
-public class ProgramController {
+public class ProgramController implements ProgramControllerInterface {
     private FileCatalog catalog;
     private FileReaderService reader;
     private CipherService cipher;
