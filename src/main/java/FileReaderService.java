@@ -9,7 +9,7 @@ public class FileReaderService {
 
             String line;
             while ((line = br.readLine()) != null) {
-                content.append(line);
+                content.append(line).append(System.lineSeparator());
             }
 
             return content.toString();
