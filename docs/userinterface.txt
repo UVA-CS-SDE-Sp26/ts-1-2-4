@@ -14,7 +14,7 @@ Outputs
 - User‑friendly error messages.
 
 Interface (proposed)
-- class TopSecretApp
+- class TopSecret
   - main(String[] args)
   - ProgramController controller
   
