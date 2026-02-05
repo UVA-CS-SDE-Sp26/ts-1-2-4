@@ -1,2 +1,4 @@
-public class FileReaderService {
+import interfaces.FileCatalogInterface;
+
+public class FileReaderService implements FileCatalogInterface {
 }
