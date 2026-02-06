@@ -1,4 +1,5 @@
 import java.util.Optional;
+import java.util.List;
 import interfaces.ProgramControllerInterface;
 
 public class ProgramController implements ProgramControllerInterface {
@@ -13,10 +14,34 @@ public class ProgramController implements ProgramControllerInterface {
     }
 
     public String listFiles() {
-        return "Listing files...";
+        List<String> files = catalog.listFiles();
+        int counter = 1;
+        String outputString;
+        if  (files.isEmpty()) {
+            outputString = "No files found.";
+        } else {
+            outputString = "";
+            for (String file : files) {
+                String twoDigitString = String.format("%02d", counter);
+                String newLine = twoDigitString + " " + file+ "\n";
+                outputString += newLine;
+                counter++;
+            }
+        }
+        return outputString;
     }
     public String showFile(int index, Optional<String> keyPath) {
-        return "Uploading file...";
+        Optional<String> fileContent = catalog.getFileContent(index);
+        if (fileContent.isEmpty()) {
+            return "File not found";
+        }
+        String content = fileContent.get();
+        String key = keyPath.isPresent() ? cipher.loadKey(keyPath.get()) : cipher.loadKey();
+        try {
+            return cipher.decrypt(content, key);
+        } catch (Exception e) {
+            return "Decryption failed";
+        };
     }
 
     // Getters and Setters
