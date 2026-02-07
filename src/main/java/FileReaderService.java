@@ -1,20 +1,19 @@
-import java.io.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class FileReaderService {
-    public String readFile(String path) throws IOException {
-        File f = new File(path);
-        if (f.exists()) {
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            StringBuilder content = new StringBuilder();
+public class FileReaderService implements FileReaderServiceInterface {
 
-            String line;
-            while ((line = br.readLine()) != null) {
-                content.append(line).append(System.lineSeparator());
-            }
+    @Override
+    public String readFile(String pathString) throws IOException {
+        Path path = Paths.get(pathString);
 
-            return content.toString();
+        if (Files.exists(path) && !Files.isDirectory(path)) {
+            // java.nio.file.Files provides a clean way to read all lines/content
+            return Files.readString(path);
         } else {
-            return "File does not exist";
+            throw new IOException("File does not exist");
         }
     }
 }
