@@ -1,0 +1,17 @@
+Team: 2-4 TopSecret UML
+
+class FileCatalog
+    /*
+    Manages discovery of data files and reads contents through FileReaderService.
+    Resolves the data directory via ./data, ./build/../data, then data.
+    Caches the file list and refreshes it on listFiles().
+    */
+    -fileReader: FileReaderService
+    -dataDirectoryPath: String
+    -cachedFileList: List<String>
+    +FileCatalog()
+    -resolveDataDirectory(): String
+    -refreshFileList(): void
+    +listFiles(): List<String>
+    +getByIndex(index: int): Optional<String>
+    +getByName(filename: String): Optional<String>

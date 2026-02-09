@@ -11,7 +11,7 @@ Inputs
 
 Outputs
 - Sorted list of filenames.
-- Raw file contents as a String.
+- Raw file contents as a String (via Optional).
 
 Interface (proposed)
 - class FileCatalog
@@ -19,23 +19,29 @@ Interface (proposed)
   - Optional<String> getByIndex(int index)
   - Optional<String> getByName(String filename)
 - class FileReaderService
-  - String readFile(String path)
+  - String readFile(String path) throws IOException
 
 Behavior
 - Resolve data directory in this order:
   1) ./data (project root).
   2) ./build/../data if running from build (fallback).
   3) working‑dir/data (same folder as program).
-- listFiles() returns sorted filenames (case‑insensitive) with 1‑based indices.
-- getByIndex() maps the user number to the sorted list.
-- readFile() returns raw file contents (no decipher here).
+- If no data directory is found, warn on stderr and default to ./data.
+- listFiles() refreshes the cached list each call, returns sorted filenames
+  (case‑insensitive) without indices.
+- getByIndex() maps 1‑based input into the cached list and reads by filename.
+- getByName() builds a full path and reads the file contents.
+- readFile() returns raw file contents (no decipher here) or throws IOException
+  if the path is missing or a directory.
 
 Error Handling
-- If data directory missing or empty: return empty list and a descriptive error.
-- If file cannot be read: return an error message to program control.
+- If data directory missing: print a warning; listFiles() may return empty.
+- If file cannot be read: log to stderr in FileCatalog and return Optional.empty().
+- FileReaderService throws IOException for missing paths or directories.
 
 Testing Ideas (TDD)
 - listFiles() on empty data dir returns empty list.
-- listFiles() returns sorted order and 1‑based indices.
-- getByIndex() with invalid index returns empty.
-- readFile() returns exact file contents.
+- listFiles() returns sorted order without indices.
+- getByIndex() with invalid index returns empty Optional.
+- getByName() returns empty Optional on read error.
+- readFile() returns exact file contents or throws IOException.

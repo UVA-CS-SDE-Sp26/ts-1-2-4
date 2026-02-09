@@ -29,9 +29,12 @@ Core Classes And Members(Instance Variables and Methods)
 - FileCatalog
   - listFiles(): List<String>
   - getByIndex(int index): Optional<String>
-  - String dataDir
+  - getByName(String filename): Optional<String>
+  - FileReaderService fileReader
+  - String dataDirectoryPath
+  - List<String> cachedFileList
 - FileReaderService
-  - readFile(String path): String
+  - readFile(String path): String throws IOException
 - CipherService
   - loadKey(String keyPath): CipherKey
   - decipher(String input, CipherKey key): String

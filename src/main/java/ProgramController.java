@@ -31,7 +31,7 @@ public class ProgramController implements ProgramControllerInterface {
         return outputString;
     }
     public String showFile(int index, Optional<String> keyPath) {
-        Optional<String> fileContent = catalog.getFileContent(index);
+        Optional<String> fileContent = catalog.getByIndex(index);
         if (fileContent.isEmpty()) {
             return "File not found";
         }

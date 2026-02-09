@@ -1,0 +1,8 @@
+Team: 2-4 TopSecret UML
+
+class FileReaderService
+    /*
+    This class reads file contents from a given path using java.nio.file.
+    It throws IOException when the path is missing or points to a directory.
+    */
+    +readFile(pathString: String): String throws IOException
