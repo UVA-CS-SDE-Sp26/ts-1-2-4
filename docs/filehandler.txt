@@ -18,7 +18,6 @@ Interface (proposed)
   - List<String> listFiles()
   - Optional<String> getByIndex(int index)
   - Optional<String> getByName(String filename)
-  - String dataDir
 - class FileReaderService
   - String readFile(String path)
 
