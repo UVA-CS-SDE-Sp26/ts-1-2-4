@@ -1,5 +1,4 @@
 import interfaces.FileCatalogInterface;
-import interfaces.FileReaderServiceInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +6,7 @@ import java.util.*;
 
 public class FileCatalog implements FileCatalogInterface {
 
-    private final FileReaderServiceInterface fileReader;
+    private final FileReaderService fileReader;
     private final String dataDirectoryPath;
     private List<String> cachedFileList;
 
