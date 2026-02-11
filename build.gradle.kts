@@ -19,9 +19,7 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-    exclude("**/ProgramControllerTest*")
 }
 
 tasks.compileTestJava {
-    exclude("**/ProgramControllerTest.java")
 }
