@@ -41,7 +41,7 @@ public class ProgramController implements ProgramControllerInterface {
             return cipher.decrypt(content, key);
         } catch (Exception e) {
             return "Decryption failed";
-        };
+        }
     }
 
     // Getters and Setters
