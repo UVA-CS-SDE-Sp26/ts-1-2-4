@@ -1,56 +1,134 @@
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.Cipher;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TopSecretTest {
 
-    @Test
-    void main() {
+    private PrintStream originalOut;
+    private ByteArrayOutputStream outContent;
+
+    /**
+     * Fake controller used for testing. This allows us to isolate testing without depending on real
+     * file tests from depending on real life reading or cipher logic.
+     *
+     * Allows us to:
+     * - Control return values
+     * - Track method calls
+     **/
+    static class FakeProgramController extends ProgramController {
+        String lastShowFileIndex = null;
+        Optional<String> lastKeyPath = null; // Value might not exist
 
 
-        // Test that object is instance of ProgramController
-        // Test args types: 1, 2, 3
-        // Errors:
-        String exampleFile = "Example file output. ";
-
-        FileCatalog catalog = null;
-        FileReaderService reader = null;
-        CipherService cipher = null;
-
-
-        ProgramController programController = new ProgramController(catalog, reader, cipher);
-        String[] args = {};
-        // Test fails if number of arguments is greater than 2
-        assertFalse(args.length < 2);
-
-
-//        No args prints a numbered list.
-//        - One arg prints selected file content.
-//        - Two args uses alternate key path.
-//        - Invalid number format prints error.
-//        - Too many args prints error.
-
+        /**
+         * Creates a fake controller.
+         * Passes null dependencies since overridden methods do not use them.
+         */
+        FakeProgramController() {
+            super(null, null, null); // OK for tests since we override methods we use
         }
 
-    @Test
-    void testNoArgs() {
-        String[] args = {};
-        TopSecret.main(args);
 
+        /**
+         * Simulates listing available files.
+         *
+         * @return mock file list string
+         */
+        @Override
+        public String listFiles() {
+            return "01 filea.txt\n02 fileb.txt\n";
+        }
+
+
+        /**
+         * Simulates displaying a file.
+         * Records inputs so tests can verify correct argument parsing.
+         *
+         * @param index   file number
+         * @param keyPath optional key path
+         * @return mock file content string
+         */
+        @Override
+        public String showFile(int index, Optional<String> keyPath) {
+            lastShowFileIndex = String.valueOf(index);
+            lastKeyPath = keyPath;
+            return "FILE_CONTENT_" + index;
+        }
+    }
+
+    // Run this method before every test
+    @BeforeEach
+    void setUp() {
+        originalOut = System.out;
+        outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+    }
+
+
+    // Run this method after every test
+    @AfterEach
+    void tearDown() {
+        System.setOut(originalOut);
     }
 
     @Test
-    void testOneArgs() {
-        String[] args = {"File Number"};
-        TopSecret.main(args);
+    void noArgs_printsFileList() {
+        FakeProgramController fake = new FakeProgramController();
+        TopSecret.setControllerForTests(fake); // uses your test hook :contentReference[oaicite:4]{index=4}
+
+        TopSecret.main(new String[]{});
+
+        assertEquals("01 filea.txt\n02 fileb.txt", outContent.toString().trim());
     }
 
     @Test
-    void testTwoArgs() {
-        String[] args = {"File.txt", "key.txt"};
-        TopSecret.main(args);
+    void oneArg_parsesNumber_callsShowFile_withDefaultKey() {
+        FakeProgramController fake = new FakeProgramController();
+        TopSecret.setControllerForTests(fake);
 
+        TopSecret.main(new String[]{"1"}); // using "1" as numeric index per your controller signature :contentReference[oaicite:5]{index=5}
+
+        assertEquals("FILE_CONTENT_1", outContent.toString().trim());
+        assertEquals("1", fake.lastShowFileIndex);
+        assertTrue(fake.lastKeyPath.isEmpty(), "Expected default keyPath (empty Optional)");
+    }
+
+    @Test
+    void twoArgs_parsesNumber_callsShowFile_withProvidedKeyPath() {
+        FakeProgramController fake = new FakeProgramController();
+        TopSecret.setControllerForTests(fake);
+
+        TopSecret.main(new String[]{"1", "ciphers/key.txt"});
+
+        assertEquals("FILE_CONTENT_1", outContent.toString().trim());
+        assertEquals("1", fake.lastShowFileIndex);
+        assertTrue(fake.lastKeyPath.isPresent());
+        assertEquals("ciphers/key.txt", fake.lastKeyPath.get());
+    }
+
+    @Test
+    void tooManyArgs_printsTooManyArgumentsError() {
+        FakeProgramController fake = new FakeProgramController();
+        TopSecret.setControllerForTests(fake);
+
+        TopSecret.main(new String[]{"1", "key.txt", "extra"});
+
+        assertEquals("Too many arguments", outContent.toString().trim());
+    }
+
+    @Test
+    void invalidFileNumberFormat_printsInvalidFileNumberError() {
+        FakeProgramController fake = new FakeProgramController();
+        TopSecret.setControllerForTests(fake);
+
+        TopSecret.main(new String[]{"abc"});
+
+        assertEquals("Invalid file number", outContent.toString().trim());
     }
 }
