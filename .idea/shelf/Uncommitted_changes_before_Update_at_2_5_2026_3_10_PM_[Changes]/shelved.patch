@@ -1,0 +1,31 @@
+Index: src/main/java/FileReaderService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class FileReaderService {\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/FileReaderService.java b/src/main/java/FileReaderService.java
+--- a/src/main/java/FileReaderService.java	(revision c5b19b81e677440e812e206941130862d6ec20bf)
++++ b/src/main/java/FileReaderService.java	(date 1770322247292)
+@@ -1,2 +1,20 @@
++import java.io.*;
++
+ public class FileReaderService {
++    public String readFile(String path) throws IOException {
++        File f = new File(path);
++        if (f.exists()) {
++            BufferedReader br = new BufferedReader(new FileReader(f));
++            StringBuilder content = new StringBuilder();
++
++            String line;
++            while ((line = br.readLine()) != null) {
++                content.append(line).append(System.lineSeparator());
++            }
++
++            return content.toString();
++        } else {
++            return "File does not exist";
++        }
++    }
+ }

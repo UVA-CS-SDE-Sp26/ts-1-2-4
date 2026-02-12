@@ -1,0 +1,292 @@
+Index: src/test/java/ProgramControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.junit.jupiter.api.Test;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\nclass ProgramControllerTest {\r\n\r\n    @Test\r\n    void listFiles() {\r\n    }\r\n\r\n    @Test\r\n    void showFile() {\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/ProgramControllerTest.java b/src/test/java/ProgramControllerTest.java
+--- a/src/test/java/ProgramControllerTest.java	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/src/test/java/ProgramControllerTest.java	(date 1770320577119)
+@@ -6,6 +6,7 @@
+ 
+     @Test
+     void listFiles() {
++
+     }
+ 
+     @Test
+Index: src/main/java/ProgramController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.util.Optional;\r\n\r\npublic class ProgramController {\r\n    private FileCatalog catalog;\r\n    private FileReaderService reader;\r\n    private CipherService cipher;\r\n\r\n   public ProgramController(FileCatalog catalog, FileReaderService reader, CipherService cipher) {\r\n        this.catalog = catalog;\r\n        this.reader = reader;\r\n        this.cipher = cipher;\r\n    }\r\n\r\n    public String listFiles() {\r\n        return \"Listing files...\";\r\n    }\r\n    public String showFile(int index, Optional<String> keyPath) {\r\n        return \"Uploading file...\";\r\n    }\r\n\r\n    // Getters and Setters\r\n    public FileCatalog getCatalog() {\r\n        return catalog;\r\n    }\r\n\r\n    public void setCatalog(FileCatalog catalog) {\r\n        this.catalog = catalog;\r\n    }\r\n\r\n    public FileReaderService getReader() {\r\n        return reader;\r\n    }\r\n\r\n    public void setReader(FileReaderService reader) {\r\n        this.reader = reader;\r\n    }\r\n\r\n    public CipherService getCipher() {\r\n        return cipher;\r\n    }\r\n\r\n    public void setCipher(CipherService cipher) {\r\n        this.cipher = cipher;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ProgramController.java b/src/main/java/ProgramController.java
+--- a/src/main/java/ProgramController.java	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/src/main/java/ProgramController.java	(date 1770320577114)
+@@ -1,6 +1,7 @@
+ import java.util.Optional;
++import interfaces.ProgramControllerInterface;
+ 
+-public class ProgramController {
++public class ProgramController implements ProgramControllerInterface {
+     private FileCatalog catalog;
+     private FileReaderService reader;
+     private CipherService cipher;
+Index: src/main/java/TopSecret.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/**\r\n * Commmand Line Utility\r\n */\r\npublic class TopSecret {\r\n    public static void main(String[] args) {\r\n      //Start App Logic Here\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/TopSecret.java b/src/main/java/TopSecret.java
+--- a/src/main/java/TopSecret.java	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/src/main/java/TopSecret.java	(date 1770320577114)
+@@ -1,6 +1,5 @@
+-/**
+- * Commmand Line Utility
+- */
++import interfaces.TopSecretInterface;
++
+ public class TopSecret {
+     public static void main(String[] args) {
+       //Start App Logic Here
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"FrameworkDetectionExcludesConfiguration\">\r\n    <file type=\"web\" url=\"file://$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" default=\"true\" project-jdk-name=\"25\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/.idea/misc.xml	(date 1770320629896)
+@@ -1,10 +1,14 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ExternalStorageConfigurationManager" enabled="true" />
++<<<<<<< HEAD
+   <component name="FrameworkDetectionExcludesConfiguration">
+     <file type="web" url="file://$PROJECT_DIR$" />
+   </component>
+   <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="25" project-jdk-type="JavaSDK">
++=======
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="homebrew-21" project-jdk-type="JavaSDK">
++>>>>>>> 8ea1d151cc57d58fe550c0f92dead66cd3e29d19
+     <output url="file://$PROJECT_DIR$/out" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: src/main/java/interfaces/CipherKeyInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/interfaces/CipherKeyInterface.java b/src/main/java/interfaces/CipherKeyInterface.java
+new file mode 100644
+--- /dev/null	(date 1770320577115)
++++ b/src/main/java/interfaces/CipherKeyInterface.java	(date 1770320577115)
+@@ -0,0 +1,4 @@
++package interfaces;
++
++public interface CipherKeyInterface {
++}
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleMigrationSettings\" migrationVersion=\"1\" />\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"gradleHome\" value=\"\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n          </set>\r\n        </option>\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+--- a/.idea/gradle.xml	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/.idea/gradle.xml	(date 1770320600912)
+@@ -5,7 +5,7 @@
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+-        <option name="gradleHome" value="" />
++        <option name="gradleJvm" value="openjdk-25" />
+         <option name="modules">
+           <set>
+             <option value="$PROJECT_DIR$" />
+Index: src/main/java/interfaces/FileReaderServiceInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/interfaces/FileReaderServiceInterface.java b/src/main/java/interfaces/FileReaderServiceInterface.java
+new file mode 100644
+--- /dev/null	(date 1770320577117)
++++ b/src/main/java/interfaces/FileReaderServiceInterface.java	(date 1770320577117)
+@@ -0,0 +1,4 @@
++package interfaces;
++
++public interface FileReaderServiceInterface {
++}
+Index: src/main/java/interfaces/ProgramControllerInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/interfaces/ProgramControllerInterface.java b/src/main/java/interfaces/ProgramControllerInterface.java
+new file mode 100644
+--- /dev/null	(date 1770320577118)
++++ b/src/main/java/interfaces/ProgramControllerInterface.java	(date 1770320577118)
+@@ -0,0 +1,10 @@
++package interfaces;
++
++import java.util.Optional;
++
++public interface ProgramControllerInterface {
++    String listFiles();
++
++    String showFile(int index, Optional<String> keyPath);
++
++}
+Index: src/main/java/interfaces/CipherServiceInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/interfaces/CipherServiceInterface.java b/src/main/java/interfaces/CipherServiceInterface.java
+new file mode 100644
+--- /dev/null	(date 1770320577115)
++++ b/src/main/java/interfaces/CipherServiceInterface.java	(date 1770320577115)
+@@ -0,0 +1,4 @@
++package interfaces;
++
++public interface CipherServiceInterface {
++}
+Index: src/main/java/interfaces/FileCatalogInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/interfaces/FileCatalogInterface.java b/src/main/java/interfaces/FileCatalogInterface.java
+new file mode 100644
+--- /dev/null	(date 1770320577116)
++++ b/src/main/java/interfaces/FileCatalogInterface.java	(date 1770320577116)
+@@ -0,0 +1,4 @@
++package interfaces;
++
++public interface FileCatalogInterface {
++}
+Index: src/main/java/FileCatalog.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class FileCatalog {\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/FileCatalog.java b/src/main/java/FileCatalog.java
+--- a/src/main/java/FileCatalog.java	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/src/main/java/FileCatalog.java	(date 1770320577112)
+@@ -1,2 +1,5 @@
+-public class FileCatalog {
++import interfaces.FileCatalogInterface;
++
++public class FileCatalog implements FileCatalogInterface {
++
+ }
+Index: src/main/java/FileReaderService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class FileReaderService {\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/FileReaderService.java b/src/main/java/FileReaderService.java
+--- a/src/main/java/FileReaderService.java	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/src/main/java/FileReaderService.java	(date 1770320577113)
+@@ -1,2 +1,4 @@
+-public class FileReaderService {
++import interfaces.FileCatalogInterface;
++
++public class FileReaderService implements FileCatalogInterface {
+ }
+Index: src/main/java/interfaces/TopSecretInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/interfaces/TopSecretInterface.java b/src/main/java/interfaces/TopSecretInterface.java
+new file mode 100644
+--- /dev/null	(date 1770320577118)
++++ b/src/main/java/interfaces/TopSecretInterface.java	(date 1770320577118)
+@@ -0,0 +1,7 @@
++package interfaces;
++
++/**
++ * Command Line Utility
++ */
++public interface TopSecretInterface {
++}
+Index: src/main/java/CipherKey.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class CipherKey {\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/CipherKey.java b/src/main/java/CipherKey.java
+--- a/src/main/java/CipherKey.java	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/src/main/java/CipherKey.java	(date 1770320577111)
+@@ -1,2 +1,5 @@
+-public class CipherKey {
++import interfaces.CipherKeyInterface;
++
++public class CipherKey implements CipherKeyInterface {
++    private String key;
+ }
+Index: src/main/java/CipherService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class CipherService {\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/CipherService.java b/src/main/java/CipherService.java
+--- a/src/main/java/CipherService.java	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/src/main/java/CipherService.java	(date 1770320577112)
+@@ -1,2 +1,6 @@
+-public class CipherService {
++import interfaces.CipherServiceInterface;
++
++public class CipherService implements CipherServiceInterface {
+ }
++
++
+Index: docs/filehandler.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>File Handler Plan (Team B)\r\n\r\nResponsibility\r\n- Own all direct file system access for data files.\r\n- Provide program control a clean API: list available files and return contents.\r\n- Keep data folder location flexible (project root /data or working‑dir /data).\r\n\r\nInputs\r\n- Requests to list files.\r\n- Requests to read a file by index or filename.\r\n\r\nOutputs\r\n- Sorted list of filenames.\r\n- Raw file contents as a String.\r\n\r\nInterface (proposed)\r\n- class FileCatalog\r\n  - List<String> listFiles()\r\n  - Optional<String> getByIndex(int index)\r\n  - Optional<String> getByName(String filename)\r\n  - String dataDir\r\n- class FileReaderService\r\n  - String readFile(String path)\r\n\r\nBehavior\r\n- Resolve data directory in this order:\r\n  1) ./data (project root)\r\n  2) ./build/../data if running from build (fallback)\r\n  3) working‑dir/data (same folder as program)\r\n- listFiles() returns sorted filenames (case‑insensitive) with 1‑based indices.\r\n- getByIndex() maps the user number to the sorted list.\r\n- readFile() returns raw file contents (no decipher here).\r\n\r\nError Handling\r\n- If data directory missing or empty: return empty list and a descriptive error.\r\n- If file cannot be read: return an error message to program control.\r\n\r\nTesting Ideas (TDD)\r\n- listFiles() on empty data dir returns empty list.\r\n- listFiles() returns sorted order and 1‑based indices.\r\n- getByIndex() with invalid index returns empty.\r\n- readFile() returns exact file contents.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/filehandler.txt b/docs/filehandler.txt
+--- a/docs/filehandler.txt	(revision 2b7a746be61044e68402470aed2d25e13cf5dc91)
++++ b/docs/filehandler.txt	(date 1770320577111)
+@@ -24,9 +24,9 @@
+ 
+ Behavior
+ - Resolve data directory in this order:
+-  1) ./data (project root)
+-  2) ./build/../data if running from build (fallback)
+-  3) working‑dir/data (same folder as program)
++  1) ./data (project root).
++  2) ./build/../data if running from build (fallback).
++  3) working‑dir/data (same folder as program).
+ - listFiles() returns sorted filenames (case‑insensitive) with 1‑based indices.
+ - getByIndex() maps the user number to the sorted list.
+ - readFile() returns raw file contents (no decipher here).
+@@ -39,4 +39,4 @@
+ - listFiles() on empty data dir returns empty list.
+ - listFiles() returns sorted order and 1‑based indices.
+ - getByIndex() with invalid index returns empty.
+-- readFile() returns exact file contents.
++- readFile() returns exact file contents.
+\ No newline at end of file
