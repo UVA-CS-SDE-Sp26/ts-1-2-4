@@ -1,0 +1,1434 @@
+Index: src/main/java/TopSecret.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.util.Optional;\r\n\r\npublic class TopSecret {\r\n\r\n    private static ProgramController controller = new ProgramController(\r\n            new FileCatalog(),\r\n            new FileReaderService(),\r\n            new CipherService()\r\n    );\r\n\r\n    // test hook (optional)\r\n    static void setControllerForTests(ProgramController c) {\r\n        controller = c;\r\n    }\r\n\r\n    public static void main(String[] args) {\r\n\r\n        // 0 args: list files\r\n        if (args.length == 0) {\r\n            System.out.println(controller.listFiles());\r\n            return;\r\n        }\r\n\r\n        // >2 args: error\r\n        if (args.length > 2) {\r\n            System.out.println(\"Too many arguments\");\r\n            return;\r\n        }\r\n\r\n        // parse file number (expects something like \"01\")\r\n        String fileNumStr = args[0];\r\n        int index;\r\n        try {\r\n            index = Integer.parseInt(fileNumStr);\r\n        } catch (NumberFormatException e) {\r\n            System.out.println(\"Invalid file number\");\r\n            return;\r\n        }\r\n\r\n        Optional<String> keyPath = Optional.empty();\r\n        if (args.length == 2) {\r\n            keyPath = Optional.of(args[1]);\r\n        }\r\n\r\n        System.out.println(controller.showFile(index, keyPath));\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/TopSecret.java b/src/main/java/TopSecret.java
+--- a/src/main/java/TopSecret.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/main/java/TopSecret.java	(date 1770924023356)
+@@ -1,6 +1,7 @@
+ import java.util.Optional;
++import interfaces.TopSecretInterface;
+ 
+-public class TopSecret {
++public class TopSecret implements TopSecretInterface {
+ 
+     private static ProgramController controller = new ProgramController(
+             new FileCatalog(),
+@@ -13,7 +14,8 @@
+         controller = c;
+     }
+ 
+-    public static void main(String[] args) {
++    @Override
++    public void run(String[] args) {
+ 
+         // 0 args: list files
+         if (args.length == 0) {
+@@ -44,4 +46,8 @@
+ 
+         System.out.println(controller.showFile(index, keyPath));
+     }
++
++    public static void main(String[] args) {
++        new TopSecret().run(args);
++    }
+ }
+Index: docs/doc_format.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Documentation Format Guide (Role Docs)\r\n\r\nPurpose\r\n- Standardize the format for role‑specific docs in /docs (e.g., filehandler.txt).\r\n- Keep docs short, scannable, and focused on a single responsibility.\r\n\r\nGeneral rules\r\n- Plain text only.\r\n- Use short headings with Title Case.\r\n- Use dash bullets for lists.\r\n- Keep lines under ~90 characters when possible.\r\n- Avoid long paragraphs; prefer bullets.\r\n- No code blocks unless necessary for syntax or examples.\r\n- Class names and methods must match the allowed list in docs/readme.txt.\r\n\r\nRequired sections (in this order)\r\n1) Title\r\n- One line: the document name and owner (team or role).\r\n\r\n2) Responsibility\r\n- 2–5 bullets describing what this part owns and does not own.\r\n\r\n3) Inputs\r\n- What data/commands this part receives.\r\n\r\n4) Outputs\r\n- What data/commands this part returns or produces.\r\n\r\n5) Interface (proposed)\r\n- List classes and key methods or functions.\r\n- Keep method signatures short and language‑agnostic.\r\n\r\n6) Behavior\r\n- Bullet steps for normal flow.\r\n\r\n7) Error Handling\r\n- Expected errors and how they surface to other parts.\r\n\r\n8) Testing Ideas (TDD)\r\n- 3–6 test cases written as short bullets.\r\n\r\nOptional sections (use only if needed)\r\n- Data Layout\r\n- Dependencies\r\n- Notes\r\n\r\nExample (for LLMs to follow)\r\n\r\nTitle\r\nProgram Control Plan (Team C)\r\n\r\nResponsibility\r\n- Orchestrate program flow based on CLI arguments.\r\n- Call File Handler to list files or fetch file contents.\r\n- Pass raw content to Cipher (if enabled) and return readable output.\r\n- Do not access the file system directly.\r\n\r\nInputs\r\n- CLI arguments: [index], [optional key path].\r\n\r\nOutputs\r\n- Printed file list or decoded file contents.\r\n- User‑friendly error messages.\r\n\r\nInterface (proposed)\r\n- class ProgramController\r\n  - String listFiles()\r\n  - String showFile(int index, Optional<Path> keyPath)\r\n\r\nBehavior\r\n- If no args: list files and return numbered list.\r\n- If index provided: fetch file, optionally decipher, return content.\r\n\r\nError Handling\r\n- If index invalid: return \"Invalid file number\".\r\n- If file read fails: return \"Unable to read file\".\r\n- If cipher key invalid: return \"Invalid key\".\r\n\r\nTesting Ideas (TDD)\r\n- No args returns a numbered list.\r\n- Invalid index returns error message.\r\n- Valid index returns file content.\r\n- Invalid key returns error message.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/doc_format.txt b/docs/doc_format.txt
+--- a/docs/doc_format.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/doc_format.txt	(date 1770924023351)
+@@ -65,15 +65,15 @@
+ Interface (proposed)
+ - class ProgramController
+   - String listFiles()
+-  - String showFile(int index, Optional<Path> keyPath)
++  - String showFile(int index, Optional<String> keyPath)
+ 
+ Behavior
+ - If no args: list files and return numbered list.
+ - If index provided: fetch file, optionally decipher, return content.
+ 
+ Error Handling
+-- If index invalid: return "Invalid file number".
+-- If file read fails: return "Unable to read file".
++- If index invalid: return "File not found".
++- If file read fails: return "File not found".
+ - If cipher key invalid: return "Invalid key".
+ 
+ Testing Ideas (TDD)
+Index: docs/readme_format.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Readme Format Guide (HW‑Level)\r\n\r\nPurpose\r\n- Standardize the homework‑level readme for each HW.\r\n- Summarize the full assignment across all roles in one place.\r\n\r\nGeneral rules\r\n- Plain text only.\r\n- Use short headings with Title Case.\r\n- Use dash bullets for lists.\r\n- Keep lines under ~90 characters when possible.\r\n- Avoid long paragraphs; prefer bullets.\r\n- No code blocks unless needed for commands/examples.\r\n\r\nRequired sections (in this order)\r\n1) Title\r\n- One line: \"TopSecret HW <#> Readme\".\r\n\r\n2) Goal\r\n- 1–2 bullets describing the assignment objective.\r\n\r\n3) Team Roles\r\n- List each role with a one‑line responsibility summary.\r\n\r\n4) Architecture Overview\r\n- 4–8 bullets describing major components and how they interact.\r\n\r\n5) Core Classes And Members(Instance Variables and Methods)\r\n- List each class and the key methods and instance variables.\r\n- Prefer primitives and common types when possible; use custom types when they clarify\r\n  ownership, structure, or reduce ambiguity.\r\n\r\n6) Program Flow\r\n- Two short flows: no‑args and args present.\r\n\r\n7) Command Usage\r\n- Show the primary run commands and argument meanings.\r\n\r\n8) File/Folder Layout\r\n- Bullet list of required folders and key files.\r\n\r\n9) Testing Approach (TDD)\r\n- 3–6 bullets for how testing is organized.\r\n\r\nOptional sections (use only if needed)\r\n- Assumptions\r\n- Open Questions\r\n- Future Extensions\r\n\r\nExample (for LLMs to follow)\r\n\r\nTitle\r\nTopSecret HW 2 Readme\r\n\r\nGoal\r\n- Build a CLI tool to list mission files or display one file by number.\r\n\r\nTeam Roles\r\n- Team A: CLI parsing and user prompts.\r\n- Team B: File access and data listing.\r\n- Team C: Program control and coordination.\r\n- Team D: Cipher decoding (if required).\r\n\r\nArchitecture Overview\r\n- TopSecretApp parses args and delegates to ProgramController.\r\n- ProgramController requests file lists or contents from File Handler.\r\n- CipherService deciphers content when ciphering is enabled.\r\n- UI layer prints lists, file contents, or errors.\r\n\r\nCore Classes And Members(Instance Variables and Methods)\r\n- TopSecretApp\r\n  - main(String[] args)\r\n  - ProgramController controller\r\n- ProgramController\r\n  - listFiles(): String\r\n  - showFile(int index, Optional<String> keyPath): String\r\n  - FileCatalog catalog\r\n  - FileReaderService reader\r\n  - CipherService cipher\r\n- FileCatalog\r\n  - listFiles(): List<String>\r\n  - getByIndex(int index): Optional<String>\r\n  - String dataDir\r\n- FileReaderService\r\n  - readFile(String path): String\r\n- CipherService\r\n  - loadKey(String keyPath): CipherKey\r\n  - decipher(String input, CipherKey key): String\r\n- CipherKey\r\n  - Map<Character, Character> mapping\r\n  - validate(): boolean\r\n\r\nProgram Flow\r\n- No args: list files -> print numbered list -> exit.\r\n- With index: read file -> optional decipher -> print content -> exit.\r\n\r\nCommand Usage\r\n- java topsecret\r\n- java topsecret <fileNumber> [keyPath]\r\n\r\nFile/Folder Layout\r\n- data/ (mission files)\r\n- ciphers/key.txt (cipher key)\r\n- docs/ (role documentation)\r\n\r\nTesting Approach (TDD)\r\n- Unit tests for file listing and file reading.\r\n- Unit tests for cipher validation and decoding.\r\n- Integration test for CLI end‑to‑end flow.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/readme_format.txt b/docs/readme_format.txt
+--- a/docs/readme_format.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/readme_format.txt	(date 1770924023356)
+@@ -62,13 +62,14 @@
+ - Team D: Cipher decoding (if required).
+ 
+ Architecture Overview
+-- TopSecretApp parses args and delegates to ProgramController.
++- TopSecret parses args and delegates to ProgramController.
+ - ProgramController requests file lists or contents from File Handler.
+ - CipherService deciphers content when ciphering is enabled.
+ - UI layer prints lists, file contents, or errors.
+ 
+ Core Classes And Members(Instance Variables and Methods)
+-- TopSecretApp
++- TopSecret
++  - run(String[] args)
+   - main(String[] args)
+   - ProgramController controller
+ - ProgramController
+@@ -84,8 +85,9 @@
+ - FileReaderService
+   - readFile(String path): String
+ - CipherService
+-  - loadKey(String keyPath): CipherKey
+-  - decipher(String input, CipherKey key): String
++  - loadKey(): String
++  - loadKey(String keyPath): String
++  - decrypt(String input, String keyContent): String
+ - CipherKey
+   - Map<Character, Character> mapping
+   - validate(): boolean
+@@ -95,8 +97,8 @@
+ - With index: read file -> optional decipher -> print content -> exit.
+ 
+ Command Usage
+-- java topsecret
+-- java topsecret <fileNumber> [keyPath]
++- java TopSecret
++- java TopSecret <fileNumber> [keyPath]
+ 
+ File/Folder Layout
+ - data/ (mission files)
+Index: src/test/java/ProgramControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.junit.jupiter.api.Test;\r\nimport java.util.List;\r\nimport java.util.Optional;\r\nimport static org.junit.jupiter.api.Assertions.*;\r\nimport static org.mockito.Mockito.*;\r\n\r\nclass ProgramControllerTest {\r\n\r\n    @Test\r\n    void listFiles() {\r\n        List<String> files = List.of(\"file1.txt\", \"file2.txt\", \"file3.txt\");\r\n        FileCatalog catalog = mock(FileCatalog.class);\r\n        FileReaderService reader = mock(FileReaderService.class);\r\n        CipherService cipher = mock(CipherService.class);\r\n        when(catalog.listFiles()).thenReturn(files);\r\n        ProgramController controller = new ProgramController(catalog, reader, cipher);\r\n        String expectedOutput = \"01 file1.txt\\n02 file2.txt\\n03 file3.txt\\n\";\r\n        String actualOutput = controller.listFiles();\r\n        assertEquals(expectedOutput, actualOutput);\r\n    }\r\n\r\n    @Test\r\n    void showFile() {\r\n       int index = 1;\r\n       String keyPath = \"src/test/resources/testdata/key.txt\";\r\n       String encryptedContent = \"ENCRYPTED\";\r\n       String expectedOutput = \"Decrypted content of file2.txt\";\r\n       FileCatalog catalog = mock(FileCatalog.class);\r\n       FileReaderService reader = mock(FileReaderService.class);\r\n       CipherService cipher = mock(CipherService.class);\r\n       when(catalog.getByIndex(index)).thenReturn(Optional.of(encryptedContent));\r\n       when(cipher.loadKey(keyPath)).thenReturn(\"KEY\");\r\n       when(cipher.decrypt(encryptedContent, \"KEY\")).thenReturn(expectedOutput);\r\n       ProgramController controller = new ProgramController(catalog, reader, cipher);\r\n       String actualOutput = controller.showFile(index, Optional.of(keyPath));\r\n       assertEquals(expectedOutput,actualOutput,\"showFile should return decrypted content for encrypted files\");\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/ProgramControllerTest.java b/src/test/java/ProgramControllerTest.java
+--- a/src/test/java/ProgramControllerTest.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/test/java/ProgramControllerTest.java	(date 1770924023356)
+@@ -7,7 +7,7 @@
+ class ProgramControllerTest {
+ 
+     @Test
+-    void listFiles() {
++    void listFiles_formatsNumberedOutput() {
+         List<String> files = List.of("file1.txt", "file2.txt", "file3.txt");
+         FileCatalog catalog = mock(FileCatalog.class);
+         FileReaderService reader = mock(FileReaderService.class);
+@@ -20,19 +20,92 @@
+     }
+ 
+     @Test
+-    void showFile() {
+-       int index = 1;
+-       String keyPath = "src/test/resources/testdata/key.txt";
+-       String encryptedContent = "ENCRYPTED";
+-       String expectedOutput = "Decrypted content of file2.txt";
+-       FileCatalog catalog = mock(FileCatalog.class);
+-       FileReaderService reader = mock(FileReaderService.class);
+-       CipherService cipher = mock(CipherService.class);
+-       when(catalog.getByIndex(index)).thenReturn(Optional.of(encryptedContent));
+-       when(cipher.loadKey(keyPath)).thenReturn("KEY");
+-       when(cipher.decrypt(encryptedContent, "KEY")).thenReturn(expectedOutput);
+-       ProgramController controller = new ProgramController(catalog, reader, cipher);
+-       String actualOutput = controller.showFile(index, Optional.of(keyPath));
+-       assertEquals(expectedOutput,actualOutput,"showFile should return decrypted content for encrypted files");
++    void listFiles_returnsNoFilesMessageWhenCatalogEmpty() {
++        FileCatalog catalog = mock(FileCatalog.class);
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService cipher = mock(CipherService.class);
++        when(catalog.listFiles()).thenReturn(List.of());
++
++        ProgramController controller = new ProgramController(catalog, reader, cipher);
++        assertEquals("No files found.", controller.listFiles());
++    }
++
++    @Test
++    void showFile_returnsFileNotFoundWhenIndexMissing() {
++        FileCatalog catalog = mock(FileCatalog.class);
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService cipher = mock(CipherService.class);
++        when(catalog.getByIndex(9)).thenReturn(Optional.empty());
++
++        ProgramController controller = new ProgramController(catalog, reader, cipher);
++        assertEquals("File not found", controller.showFile(9, Optional.empty()));
++        verify(cipher, never()).decrypt(anyString(), anyString());
++    }
++
++    @Test
++    void showFile_usesDefaultKeyWhenNoKeyPathProvided() {
++        int index = 1;
++        String encryptedContent = "ENCRYPTED";
++        String expectedOutput = "DECRYPTED";
++        FileCatalog catalog = mock(FileCatalog.class);
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService cipher = mock(CipherService.class);
++
++        when(catalog.getByIndex(index)).thenReturn(Optional.of(encryptedContent));
++        when(cipher.loadKey()).thenReturn("DEFAULT_KEY");
++        when(cipher.decrypt(encryptedContent, "DEFAULT_KEY")).thenReturn(expectedOutput);
++
++        ProgramController controller = new ProgramController(catalog, reader, cipher);
++        assertEquals(expectedOutput, controller.showFile(index, Optional.empty()));
++        verify(cipher).loadKey();
++        verify(cipher, never()).loadKey(anyString());
++    }
++
++    @Test
++    void showFile_usesProvidedKeyPathWhenPresent() {
++        int index = 1;
++        String keyPath = "ciphers/alternate.txt";
++        String encryptedContent = "ENCRYPTED";
++        String expectedOutput = "DECRYPTED";
++        FileCatalog catalog = mock(FileCatalog.class);
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService cipher = mock(CipherService.class);
++
++        when(catalog.getByIndex(index)).thenReturn(Optional.of(encryptedContent));
++        when(cipher.loadKey(keyPath)).thenReturn("KEY");
++        when(cipher.decrypt(encryptedContent, "KEY")).thenReturn(expectedOutput);
++
++        ProgramController controller = new ProgramController(catalog, reader, cipher);
++        assertEquals(expectedOutput, controller.showFile(index, Optional.of(keyPath)));
++        verify(cipher).loadKey(keyPath);
++        verify(cipher, never()).loadKey();
++    }
++
++    @Test
++    void showFile_returnsInvalidKeyWhenLoadedKeyIsNull() {
++        FileCatalog catalog = mock(FileCatalog.class);
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService cipher = mock(CipherService.class);
++
++        when(catalog.getByIndex(1)).thenReturn(Optional.of("abc"));
++        when(cipher.loadKey("bad-key-path")).thenReturn(null);
++
++        ProgramController controller = new ProgramController(catalog, reader, cipher);
++        assertEquals("Invalid key", controller.showFile(1, Optional.of("bad-key-path")));
++        verify(cipher, never()).decrypt(anyString(), anyString());
++    }
++
++    @Test
++    void showFile_returnsDecryptionFailedWhenCipherThrows() {
++        FileCatalog catalog = mock(FileCatalog.class);
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService cipher = mock(CipherService.class);
++
++        when(catalog.getByIndex(1)).thenReturn(Optional.of("abc"));
++        when(cipher.loadKey()).thenReturn("KEY");
++        when(cipher.decrypt("abc", "KEY")).thenThrow(new RuntimeException("boom"));
++
++        ProgramController controller = new ProgramController(catalog, reader, cipher);
++        assertEquals("Decryption failed", controller.showFile(1, Optional.empty()));
+     }
+ }
+Index: docs/Classes_Documentation/CipherKey.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>i
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/Classes_Documentation/CipherKey.txt b/docs/Classes_Documentation/CipherKey.txt
+--- a/docs/Classes_Documentation/CipherKey.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/Classes_Documentation/CipherKey.txt	(date 1770924023351)
+@@ -1,1 +1,13 @@
+-i
+\ No newline at end of file
++Team: 2-4 TopSecret UML
++
++class CipherKey
++    /*
++    Parses 2-line key content and builds a cipher->plain mapping.
++    Validates key format and uniqueness constraints.
++    */
++    -mapping: Map<Character, Character>
++    -parseError: boolean
++    +CipherKey(content: String)
++    -parse(content: String): void
++    +validate(): boolean
++    +getMapping(): Map<Character, Character>
+Index: docs/Classes_Documentation/CipherService.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/Classes_Documentation/CipherService.txt b/docs/Classes_Documentation/CipherService.txt
+--- a/docs/Classes_Documentation/CipherService.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/Classes_Documentation/CipherService.txt	(date 1770924023351)
+@@ -1,0 +1,17 @@
++Team: 2-4 TopSecret UML
++
++class CipherService
++    /*
++    Loads default or alternate key content, validates it, then decrypts text.
++    Uses FileReaderService for key file access.
++    */
++    -DEFAULT_KEY_PATH: String
++    -fileReader: FileReaderService
++    +CipherService()
++    +CipherService(fileReader: FileReaderService)
++    +loadKey(): String
++    +loadKey(keyPath: String): String
++    +decrypt(input: String, keyContent: String): String
++    -applyMapping(input: String, mapping: Map<Character, Character>): String
++    -resolveDefaultKeyPath(): String
++    -readAndValidate(path: String): String
+Index: docs/userinterface.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>User Interface Plan (Team A)\r\n\r\nResponsibility\r\n- Define valid command‑line inputs and outputs.\r\n- Display file lists, file contents, and error messages.\r\n- Do not read files directly or perform deciphering.\r\n\r\nInputs\r\n- CLI arguments: none, [fileNumber], or [fileNumber] [keyPath].\r\n\r\nOutputs\r\n- Numbered list of available files.\r\n- File contents (plain or deciphered).\r\n- User‑friendly error messages.\r\n\r\nInterface (proposed)\r\n- class TopSecret\r\n  - main(String[] args)\r\n  - ProgramController controller\r\n  \r\n\r\nBehavior\r\n- If no args: call ProgramController.listFiles() and print result.\r\n- If one arg: parse file number, call ProgramController.showFile(index, empty).\r\n- If two args: parse number and key path, call ProgramController.showFile(index, keyPath).\r\n- Print output and exit.\r\n\r\nError Handling\r\n- If arg count invalid: print \"Too many arguments\".\r\n- If file number invalid format: print \"Invalid file number\".\r\n- If file number out of range: print \"File number not found\".\r\n- If file cannot be read: print \"Unable to read file\".\r\n- If cipher key invalid or missing: print \"Invalid key\".\r\n\r\nTesting Ideas (TDD)\r\n- No args prints a numbered list.\r\n- One arg prints selected file content.\r\n- Two args uses alternate key path.\r\n- Invalid number format prints error.\r\n- Too many args prints error.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/userinterface.txt b/docs/userinterface.txt
+--- a/docs/userinterface.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/userinterface.txt	(date 1770924023356)
+@@ -13,8 +13,9 @@
+ - File contents (plain or deciphered).
+ - User‑friendly error messages.
+ 
+-Interface (proposed)
++Interface
+ - class TopSecret
++  - run(String[] args)
+   - main(String[] args)
+   - ProgramController controller
+   
+@@ -28,8 +29,7 @@
+ Error Handling
+ - If arg count invalid: print "Too many arguments".
+ - If file number invalid format: print "Invalid file number".
+-- If file number out of range: print "File number not found".
+-- If file cannot be read: print "Unable to read file".
++- If file number out of range or file cannot be resolved: print "File not found".
+ - If cipher key invalid or missing: print "Invalid key".
+ 
+ Testing Ideas (TDD)
+@@ -38,3 +38,4 @@
+ - Two args uses alternate key path.
+ - Invalid number format prints error.
+ - Too many args prints error.
++- Negative or non-standard numeric argument is still passed to ProgramController.
+Index: docs/Classes_Documentation/ProgramController.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/Classes_Documentation/ProgramController.txt b/docs/Classes_Documentation/ProgramController.txt
+--- a/docs/Classes_Documentation/ProgramController.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/Classes_Documentation/ProgramController.txt	(date 1770924023351)
+@@ -1,0 +1,19 @@
++Team: 2-4 TopSecret UML
++
++class ProgramController
++    /*
++    Coordinates listing files and showing one file's deciphered content.
++    Delegates file reads to FileCatalog and key/decrypt work to CipherService.
++    */
++    -catalog: FileCatalog
++    -reader: FileReaderService
++    -cipher: CipherService
++    +ProgramController(catalog: FileCatalog, reader: FileReaderService, cipher: CipherService)
++    +listFiles(): String
++    +showFile(index: int, keyPath: Optional<String>): String
++    +getCatalog(): FileCatalog
++    +setCatalog(catalog: FileCatalog): void
++    +getReader(): FileReaderService
++    +setReader(reader: FileReaderService): void
++    +getCipher(): CipherService
++    +setCipher(cipher: CipherService): void
+Index: src/test/java/HW2IntegrationTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.junit.jupiter.api.AfterEach;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport java.io.IOException;\r\nimport java.nio.file.Files;\r\nimport java.nio.file.Path;\r\nimport java.nio.file.Paths;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.Optional;\r\n\r\nimport static org.junit.jupiter.api.Assertions.assertEquals;\r\nimport static org.junit.jupiter.api.Assertions.assertTrue;\r\n\r\nclass HW2IntegrationTest {\r\n    private Path dataDir;\r\n    private boolean createdDataDir;\r\n    private final List<Path> createdFiles = new ArrayList<>();\r\n\r\n    @BeforeEach\r\n    void setUp() throws IOException {\r\n        dataDir = Paths.get(\"data\");\r\n        createdDataDir = Files.notExists(dataDir);\r\n        if (createdDataDir) {\r\n            Files.createDirectories(dataDir);\r\n        }\r\n        createdFiles.clear();\r\n    }\r\n\r\n    @AfterEach\r\n    void tearDown() throws IOException {\r\n        for (Path file : createdFiles) {\r\n            Files.deleteIfExists(file);\r\n        }\r\n        if (createdDataDir && Files.exists(dataDir)) {\r\n            try (var stream = Files.list(dataDir)) {\r\n                if (stream.findAny().isEmpty()) {\r\n                    Files.deleteIfExists(dataDir);\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void listFiles_integration() throws IOException {\r\n        String fileA = createDataFile(\"hw2_it_alpha.txt\", \"bcd\");\r\n        String fileB = createDataFile(\"hw2_it_beta.txt\", \"efg\");\r\n\r\n        ProgramController controller = new ProgramController(\r\n            new FileCatalog(),\r\n            new FileReaderService(),\r\n            new CipherService()\r\n        );\r\n\r\n        String output = controller.listFiles();\r\n        assertTrue(output.contains(\" \" + fileA + \"\\n\"));\r\n        assertTrue(output.contains(\" \" + fileB + \"\\n\"));\r\n    }\r\n\r\n    @Test\r\n    void showFile_integration_withKey() throws IOException {\r\n        String filename = createDataFile(\"hw2_it_secret.txt\", \"bcd\");\r\n        FileCatalog catalog = new FileCatalog();\r\n        List<String> files = catalog.listFiles();\r\n        int index = files.indexOf(filename) + 1;\r\n        assertTrue(index > 0, \"Expected file to be present in catalog list\");\r\n\r\n        ProgramController controller = new ProgramController(\r\n            catalog,\r\n            new FileReaderService(),\r\n            new CipherService()\r\n        );\r\n\r\n        String output = controller.showFile(index, Optional.of(\"ciphers/key.txt\"));\r\n        assertEquals(\"abc\", output);\r\n    }\r\n\r\n    private String createDataFile(String baseName, String content) throws IOException {\r\n        String filename = uniqueFilename(baseName);\r\n        Path path = dataDir.resolve(filename);\r\n        Files.writeString(path, content);\r\n        createdFiles.add(path);\r\n        return filename;\r\n    }\r\n\r\n    private String uniqueFilename(String baseName) throws IOException {\r\n        String name = baseName;\r\n        String stem = baseName;\r\n        String ext = \"\";\r\n        int dot = baseName.lastIndexOf('.');\r\n        if (dot > 0) {\r\n            stem = baseName.substring(0, dot);\r\n            ext = baseName.substring(dot);\r\n        }\r\n\r\n        int counter = 1;\r\n        while (Files.exists(dataDir.resolve(name))) {\r\n            name = stem + \"_\" + counter + ext;\r\n            counter++;\r\n        }\r\n        return name;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/HW2IntegrationTest.java b/src/test/java/HW2IntegrationTest.java
+--- a/src/test/java/HW2IntegrationTest.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/test/java/HW2IntegrationTest.java	(date 1770924023356)
+@@ -11,26 +11,34 @@
+ import java.util.Optional;
+ 
+ import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertNotEquals;
+ import static org.junit.jupiter.api.Assertions.assertTrue;
+ 
+ class HW2IntegrationTest {
+     private Path dataDir;
+     private boolean createdDataDir;
+-    private final List<Path> createdFiles = new ArrayList<>();
++    private Path ciphersDir;
++    private boolean createdCiphersDir;
++    private final List<Path> createdPaths = new ArrayList<>();
+ 
+     @BeforeEach
+     void setUp() throws IOException {
+         dataDir = Paths.get("data");
++        ciphersDir = Paths.get("ciphers");
+         createdDataDir = Files.notExists(dataDir);
++        createdCiphersDir = Files.notExists(ciphersDir);
+         if (createdDataDir) {
+             Files.createDirectories(dataDir);
+         }
+-        createdFiles.clear();
++        if (createdCiphersDir) {
++            Files.createDirectories(ciphersDir);
++        }
++        createdPaths.clear();
+     }
+ 
+     @AfterEach
+     void tearDown() throws IOException {
+-        for (Path file : createdFiles) {
++        for (Path file : createdPaths) {
+             Files.deleteIfExists(file);
+         }
+         if (createdDataDir && Files.exists(dataDir)) {
+@@ -40,6 +48,13 @@
+                 }
+             }
+         }
++        if (createdCiphersDir && Files.exists(ciphersDir)) {
++            try (var stream = Files.list(ciphersDir)) {
++                if (stream.findAny().isEmpty()) {
++                    Files.deleteIfExists(ciphersDir);
++                }
++            }
++        }
+     }
+ 
+     @Test
+@@ -59,7 +74,7 @@
+     }
+ 
+     @Test
+-    void showFile_integration_withKey() throws IOException {
++    void showFile_integration_withProvidedKey() throws IOException {
+         String filename = createDataFile("hw2_it_secret.txt", "bcd");
+         FileCatalog catalog = new FileCatalog();
+         List<String> files = catalog.listFiles();
+@@ -76,15 +91,126 @@
+         assertEquals("abc", output);
+     }
+ 
++    @Test
++    void showFile_integration_withDefaultKeyWhenOptionalPathMissing() throws IOException {
++        String filename = createDataFile("hw2_it_default_key.txt", "bcd");
++        FileCatalog catalog = new FileCatalog();
++        int index = catalog.listFiles().indexOf(filename) + 1;
++        assertTrue(index > 0);
++
++        ProgramController controller = new ProgramController(
++            catalog,
++            new FileReaderService(),
++            new CipherService()
++        );
++
++        String output = controller.showFile(index, Optional.empty());
++        assertEquals("abc", output);
++    }
++
++    @Test
++    void showFile_integration_invalidIndexReturnsFileNotFound() throws IOException {
++        createDataFile("hw2_it_one_file.txt", "abc");
++
++        ProgramController controller = new ProgramController(
++            new FileCatalog(),
++            new FileReaderService(),
++            new CipherService()
++        );
++
++        String output = controller.showFile(9999, Optional.empty());
++        assertEquals("File not found", output);
++    }
++
++    @Test
++    void showFile_integration_invalidCustomKeyPathReturnsInvalidKey() throws IOException {
++        String filename = createDataFile("hw2_it_bad_key_path.txt", "bcd");
++        FileCatalog catalog = new FileCatalog();
++        int index = catalog.listFiles().indexOf(filename) + 1;
++        assertTrue(index > 0);
++
++        ProgramController controller = new ProgramController(
++            catalog,
++            new FileReaderService(),
++            new CipherService()
++        );
++
++        String output = controller.showFile(index, Optional.of("ciphers/does_not_exist.txt"));
++        assertEquals("Invalid key", output);
++    }
++
++    @Test
++    void showFile_integration_malformedCustomKeyReturnsInvalidKey() throws IOException {
++        String filename = createDataFile("hw2_it_bad_key_content.txt", "bcd");
++        String malformedKey = createCipherFile("hw2_it_bad.key", "abc\ncc");
++        FileCatalog catalog = new FileCatalog();
++        int index = catalog.listFiles().indexOf(filename) + 1;
++        assertTrue(index > 0);
++
++        ProgramController controller = new ProgramController(
++            catalog,
++            new FileReaderService(),
++            new CipherService()
++        );
++
++        String output = controller.showFile(index, Optional.of(malformedKey));
++        assertEquals("Invalid key", output);
++    }
++
++    @Test
++    void showFile_integration_preservesUnmappedCharacters() throws IOException {
++        String filename = createDataFile("hw2_it_symbols.txt", "bcd-!? 42\n");
++        FileCatalog catalog = new FileCatalog();
++        int index = catalog.listFiles().indexOf(filename) + 1;
++        assertTrue(index > 0);
++
++        ProgramController controller = new ProgramController(
++            catalog,
++            new FileReaderService(),
++            new CipherService()
++        );
++
++        String output = controller.showFile(index, Optional.of("ciphers/key.txt"));
++        assertEquals("abc-!? 31\n", output);
++    }
++
++    @Test
++    void createDataFile_integration_generatesUniqueNameWhenFileExists() throws IOException {
++        String first = createDataFile("hw2_it_dup.txt", "abc");
++        String second = createDataFile("hw2_it_dup.txt", "def");
++
++        assertNotEquals(first, second);
++        ProgramController controller = new ProgramController(
++            new FileCatalog(),
++            new FileReaderService(),
++            new CipherService()
++        );
++        String output = controller.listFiles();
++        assertTrue(output.contains(" " + first + "\n"));
++        assertTrue(output.contains(" " + second + "\n"));
++    }
++
+     private String createDataFile(String baseName, String content) throws IOException {
+         String filename = uniqueFilename(baseName);
+         Path path = dataDir.resolve(filename);
+         Files.writeString(path, content);
+-        createdFiles.add(path);
++        createdPaths.add(path);
+         return filename;
+     }
+ 
++    private String createCipherFile(String baseName, String content) throws IOException {
++        String filename = uniqueFilenameInDirectory(ciphersDir, baseName);
++        Path path = ciphersDir.resolve(filename);
++        Files.writeString(path, content);
++        createdPaths.add(path);
++        return ciphersDir.resolve(filename).toString();
++    }
++
+     private String uniqueFilename(String baseName) throws IOException {
++        return uniqueFilenameInDirectory(dataDir, baseName);
++    }
++
++    private String uniqueFilenameInDirectory(Path directory, String baseName) throws IOException {
+         String name = baseName;
+         String stem = baseName;
+         String ext = "";
+@@ -95,7 +221,7 @@
+         }
+ 
+         int counter = 1;
+-        while (Files.exists(dataDir.resolve(name))) {
++        while (Files.exists(directory.resolve(name))) {
+             name = stem + "_" + counter + ext;
+             counter++;
+         }
+Index: src/test/java/CipherKeyTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.junit.jupiter.api.Test;\r\n\r\nimport java.util.Map;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\nclass CipherKeyTest {\r\n\r\n    @Test\r\n    void validateSucceedsForTwoLineKey() {\r\n        String content = \"abc\\nbcd\";\r\n        CipherKey key = new CipherKey(content);\r\n\r\n        assertTrue(key.validate());\r\n        assertEquals(Map.of('b', 'a', 'c', 'b', 'd', 'c'), key.getMapping());\r\n    }\r\n\r\n    @Test\r\n    void validateFailsForNullOrEmptyContent() {\r\n        CipherKey nullKey = new CipherKey(null);\r\n        assertFalse(nullKey.validate());\r\n\r\n        CipherKey emptyKey = new CipherKey(\"\");\r\n        assertFalse(emptyKey.validate());\r\n    }\r\n\r\n    @Test\r\n    void validateFailsWhenLineCountIsNotTwo() {\r\n        CipherKey oneLine = new CipherKey(\"abc\");\r\n        assertFalse(oneLine.validate());\r\n\r\n        CipherKey threeLines = new CipherKey(\"abc\\ndef\\nghi\");\r\n        assertFalse(threeLines.validate());\r\n    }\r\n\r\n    @Test\r\n    void validateFailsWhenLineLengthsDiffer() {\r\n        CipherKey mismatch = new CipherKey(\"abc\\nbc\");\r\n        assertFalse(mismatch.validate());\r\n    }\r\n\r\n    @Test\r\n    void validateFailsWhenCipherCharactersDuplicate() {\r\n        CipherKey duplicateCipher = new CipherKey(\"ab\\ncc\");\r\n        assertFalse(duplicateCipher.validate());\r\n    }\r\n\r\n    @Test\r\n    void validateFailsWhenPlainCharactersDuplicate() {\r\n        CipherKey duplicatePlain = new CipherKey(\"aa\\nbc\");\r\n        assertFalse(duplicatePlain.validate());\r\n    }\r\n\r\n    @Test\r\n    void validateIgnoresEmptyLinesAroundKey() {\r\n        CipherKey key = new CipherKey(\"\\nabc\\nbcd\\n\");\r\n        assertTrue(key.validate());\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/CipherKeyTest.java b/src/test/java/CipherKeyTest.java
+--- a/src/test/java/CipherKeyTest.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/test/java/CipherKeyTest.java	(date 1770924023356)
+@@ -56,4 +56,12 @@
+         CipherKey key = new CipherKey("\nabc\nbcd\n");
+         assertTrue(key.validate());
+     }
++
++    @Test
++    void getMapping_isUnmodifiableView() {
++        CipherKey key = new CipherKey("abc\nbcd");
++        Map<Character, Character> mapping = key.getMapping();
++
++        assertThrows(UnsupportedOperationException.class, () -> mapping.put('x', 'y'));
++    }
+ }
+Index: src/test/java/CipherServiceTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.junit.jupiter.api.Test;\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\nclass CipherServiceTest {\r\n\r\n    @Test\r\n    void decryptReturnsEmptyForNullOrEmptyInput() {\r\n        CipherService service = new CipherService();\r\n        String key = \"ab\\nbc\";\r\n\r\n        assertEquals(\"\", service.decrypt(null, key));\r\n        assertEquals(\"\", service.decrypt(\"\", key));\r\n    }\r\n\r\n    @Test\r\n    void decryptReturnsInvalidKeyWhenKeyIsBad() {\r\n        CipherService service = new CipherService();\r\n\r\n        assertEquals(\"Invalid key\", service.decrypt(\"abc\", null));\r\n        assertEquals(\"Invalid key\", service.decrypt(\"abc\", \"\"));\r\n        assertEquals(\"Invalid key\", service.decrypt(\"abc\", \"a\"));\r\n        assertEquals(\"Invalid key\", service.decrypt(\"abc\", \"ab\\nb\"));\r\n        assertEquals(\"Invalid key\", service.decrypt(\"abc\", \"aa\\nbc\"));\r\n        assertEquals(\"Invalid key\", service.decrypt(\"abc\", \"ab\\ncc\"));\r\n    }\r\n\r\n    @Test\r\n    void decryptAppliesMappingAndPreservesOtherCharacters() {\r\n        CipherService service = new CipherService();\r\n        String key = \"abc\\nbcd\"; // plain->cipher, so decipher maps b->a, c->b, d->c\r\n\r\n        String input = \"bcd-xy\\n\";\r\n        String output = service.decrypt(input, key);\r\n\r\n        assertEquals(\"abc-xy\\n\", output);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/CipherServiceTest.java b/src/test/java/CipherServiceTest.java
+--- a/src/test/java/CipherServiceTest.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/test/java/CipherServiceTest.java	(date 1770924023356)
+@@ -1,5 +1,8 @@
+ import org.junit.jupiter.api.Test;
+ import static org.junit.jupiter.api.Assertions.*;
++import static org.mockito.Mockito.*;
++
++import java.io.IOException;
+ 
+ class CipherServiceTest {
+ 
+@@ -34,4 +37,63 @@
+ 
+         assertEquals("abc-xy\n", output);
+     }
++
++    @Test
++    void loadKey_defaultPathReturnsValidatedContent() {
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService service = new CipherService(reader);
++        String keyContent = "abc\nbcd";
++
++        try {
++            when(reader.readFile("./ciphers/key.txt")).thenReturn(keyContent);
++        } catch (IOException e) {
++            fail(e);
++        }
++
++        assertEquals(keyContent, service.loadKey());
++    }
++
++    @Test
++    void loadKey_customPathReturnsValidatedContent() {
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService service = new CipherService(reader);
++        String keyContent = "abc\nbcd";
++
++        try {
++            when(reader.readFile("ciphers/alternate.txt")).thenReturn(keyContent);
++        } catch (IOException e) {
++            fail(e);
++        }
++
++        assertEquals(keyContent, service.loadKey("ciphers/alternate.txt"));
++    }
++
++    @Test
++    void loadKey_customPathReturnsNullForNullBlankOrUnreadable() {
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService service = new CipherService(reader);
++
++        assertNull(service.loadKey(null));
++        assertNull(service.loadKey("   "));
++
++        try {
++            when(reader.readFile("missing.txt")).thenThrow(new IOException("missing"));
++        } catch (IOException e) {
++            fail(e);
++        }
++        assertNull(service.loadKey("missing.txt"));
++    }
++
++    @Test
++    void loadKey_returnsNullWhenKeyFormatIsInvalid() {
++        FileReaderService reader = mock(FileReaderService.class);
++        CipherService service = new CipherService(reader);
++
++        try {
++            when(reader.readFile("bad.txt")).thenReturn("abc\ncc");
++        } catch (IOException e) {
++            fail(e);
++        }
++        assertNull(service.loadKey("bad.txt"));
++    }
+ }
+Index: src/main/java/ProgramController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.util.Optional;\r\nimport java.util.List;\r\nimport interfaces.ProgramControllerInterface;\r\n\r\npublic class ProgramController implements ProgramControllerInterface {\r\n    private FileCatalog catalog;\r\n    private FileReaderService reader;\r\n    private CipherService cipher;\r\n\r\n   public ProgramController(FileCatalog catalog, FileReaderService reader, CipherService cipher) {\r\n        this.catalog = catalog;\r\n        this.reader = reader;\r\n        this.cipher = cipher;\r\n    }\r\n\r\n    public String listFiles() {\r\n        List<String> files = catalog.listFiles();\r\n        int counter = 1;\r\n        String outputString;\r\n        if  (files.isEmpty()) {\r\n            outputString = \"No files found.\";\r\n        } else {\r\n            outputString = \"\";\r\n            for (String file : files) {\r\n                String twoDigitString = String.format(\"%02d\", counter);\r\n                String newLine = twoDigitString + \" \" + file+ \"\\n\";\r\n                outputString += newLine;\r\n                counter++;\r\n            }\r\n        }\r\n        return outputString;\r\n    }\r\n    public String showFile(int index, Optional<String> keyPath) {\r\n        Optional<String> fileContent = catalog.getByIndex(index);\r\n        if (fileContent.isEmpty()) {\r\n            return \"File not found\";\r\n        }\r\n        String content = fileContent.get();\r\n        String key = keyPath.isPresent() ? cipher.loadKey(keyPath.get()) : cipher.loadKey();\r\n        try {\r\n            return cipher.decrypt(content, key);\r\n        } catch (Exception e) {\r\n            return \"Decryption failed\";\r\n        }\r\n    }\r\n\r\n    // Getters and Setters\r\n    public FileCatalog getCatalog() {\r\n        return catalog;\r\n    }\r\n\r\n    public void setCatalog(FileCatalog catalog) {\r\n        this.catalog = catalog;\r\n    }\r\n\r\n    public FileReaderService getReader() {\r\n        return reader;\r\n    }\r\n\r\n    public void setReader(FileReaderService reader) {\r\n        this.reader = reader;\r\n    }\r\n\r\n    public CipherService getCipher() {\r\n        return cipher;\r\n    }\r\n\r\n    public void setCipher(CipherService cipher) {\r\n        this.cipher = cipher;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ProgramController.java b/src/main/java/ProgramController.java
+--- a/src/main/java/ProgramController.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/main/java/ProgramController.java	(date 1770924023356)
+@@ -37,6 +37,9 @@
+         }
+         String content = fileContent.get();
+         String key = keyPath.isPresent() ? cipher.loadKey(keyPath.get()) : cipher.loadKey();
++        if (key == null) {
++            return "Invalid key";
++        }
+         try {
+             return cipher.decrypt(content, key);
+         } catch (Exception e) {
+Index: build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    id(\"java\")\r\n}\r\n\r\ngroup = \"org.example\"\r\nversion = \"1.0-SNAPSHOT\"\r\n\r\nrepositories {\r\n    mavenCentral()\r\n}\r\n\r\ndependencies {\r\n    testImplementation(platform(\"org.junit:junit-bom:5.10.0\"))\r\n    testImplementation(\"org.junit.jupiter:junit-jupiter\")\r\n    testImplementation(\"org.mockito:mockito-core:5.\")\r\n    testImplementation(\"org.mockito:mockito-junit-jupiter:5.+\")\r\n    testRuntimeOnly(\"org.junit.platform:junit-platform-launcher\")\r\n}\r\n\r\ntasks.test {\r\n    useJUnitPlatform()\r\n}\r\n\r\ntasks.compileTestJava {\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build.gradle.kts b/build.gradle.kts
+--- a/build.gradle.kts	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/build.gradle.kts	(date 1770924023351)
+@@ -12,7 +12,7 @@
+ dependencies {
+     testImplementation(platform("org.junit:junit-bom:5.10.0"))
+     testImplementation("org.junit.jupiter:junit-jupiter")
+-    testImplementation("org.mockito:mockito-core:5.")
++    testImplementation("org.mockito:mockito-core:5.+")
+     testImplementation("org.mockito:mockito-junit-jupiter:5.+")
+     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+ }
+Index: src/test/java/FileCatalogTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.junit.jupiter.api.*;\r\n\r\nimport java.io.*;\r\nimport java.nio.file.*;\r\nimport java.util.*;\r\nimport java.util.stream.Stream;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\nclass FileCatalogTest {\r\n\r\n    private FileCatalog fileCatalog;\r\n    private static final String TEST_DATA_DIR = \"./data\";\r\n\r\n    @BeforeEach\r\n    void setUp() throws IOException {\r\n        //  Setup a clean \"./data\" directory for testing\r\n        Path dataPath = Paths.get(TEST_DATA_DIR);\r\n        if (!Files.exists(dataPath)) {\r\n            Files.createDirectories(dataPath);\r\n        }\r\n\r\n        // Create dummy files\r\n        Files.writeString(dataPath.resolve(\"gamma.txt\"), \"Content of Gamma\");\r\n        Files.writeString(dataPath.resolve(\"alpha.txt\"), \"Content of Alpha\");\r\n        Files.writeString(dataPath.resolve(\"Beta.txt\"), \"Content of Beta\");\r\n\r\n        fileCatalog = new FileCatalog();\r\n    }\r\n\r\n    @AfterEach\r\n    void tearDown() throws IOException {\r\n        Path dataPath = Paths.get(TEST_DATA_DIR);\r\n        if (Files.exists(dataPath)) {\r\n            try (Stream<Path> walk = Files.walk(dataPath)) {\r\n                walk.sorted(Comparator.reverseOrder())\r\n                        .map(Path::toFile)\r\n                        .forEach(File::delete);\r\n            }\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void listFiles() {\r\n        List<String> files = fileCatalog.listFiles();\r\n\r\n        assertEquals(3, files.size(), \"Should find exactly 3 files in the data directory\");\r\n\r\n        assertEquals(\"alpha.txt\", files.get(0));\r\n        assertEquals(\"Beta.txt\", files.get(1));\r\n        assertEquals(\"gamma.txt\", files.get(2));\r\n    }\r\n\r\n    @Test\r\n    void getByIndex() {\r\n        Optional<String> result1 = fileCatalog.getByIndex(1);\r\n        assertTrue(result1.isPresent());\r\n        assertEquals(\"Content of Alpha\", result1.get());\r\n\r\n        Optional<String> result2 = fileCatalog.getByIndex(2);\r\n        assertTrue(result2.isPresent());\r\n        assertEquals(\"Content of Beta\", result2.get());\r\n\r\n        Optional<String> resultZero = fileCatalog.getByIndex(0);\r\n        assertFalse(resultZero.isPresent(), \"Index 0 should return empty Optional\");\r\n\r\n        Optional<String> resultOut = fileCatalog.getByIndex(99);\r\n        assertFalse(resultOut.isPresent(), \"Out of bounds index should return empty Optional\");\r\n    }\r\n\r\n    @Test\r\n    void getByName() {\r\n        Optional<String> result = fileCatalog.getByName(\"gamma.txt\");\r\n        assertTrue(result.isPresent());\r\n        assertEquals(\"Content of Gamma\", result.get());\r\n\r\n        Optional<String> resultMissing = fileCatalog.getByName(\"ghost.txt\");\r\n        assertFalse(resultMissing.isPresent(), \"Non-existent file should return empty Optional\");\r\n\r\n        Optional<String> resultDir = fileCatalog.getByName(\".\");\r\n        assertFalse(resultDir.isPresent());\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/FileCatalogTest.java b/src/test/java/FileCatalogTest.java
+--- a/src/test/java/FileCatalogTest.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/test/java/FileCatalogTest.java	(date 1770924023356)
+@@ -51,6 +51,19 @@
+         assertEquals("gamma.txt", files.get(2));
+     }
+ 
++    @Test
++    void listFiles_refreshesWhenNewFileAppears() throws IOException {
++        List<String> initial = fileCatalog.listFiles();
++        assertEquals(3, initial.size());
++
++        Path dataPath = Paths.get(TEST_DATA_DIR);
++        Files.writeString(dataPath.resolve("delta.txt"), "Content of Delta");
++
++        List<String> updated = fileCatalog.listFiles();
++        assertEquals(4, updated.size());
++        assertTrue(updated.contains("delta.txt"));
++    }
++
+     @Test
+     void getByIndex() {
+         Optional<String> result1 = fileCatalog.getByIndex(1);
+@@ -68,6 +81,12 @@
+         assertFalse(resultOut.isPresent(), "Out of bounds index should return empty Optional");
+     }
+ 
++    @Test
++    void getByIndex_returnsEmptyWhenCalledWithNegativeIndex() {
++        Optional<String> result = fileCatalog.getByIndex(-1);
++        assertTrue(result.isEmpty());
++    }
++
+     @Test
+     void getByName() {
+         Optional<String> result = fileCatalog.getByName("gamma.txt");
+@@ -80,4 +99,32 @@
+         Optional<String> resultDir = fileCatalog.getByName(".");
+         assertFalse(resultDir.isPresent());
+     }
+-}
+\ No newline at end of file
++
++    @Test
++    void listFiles_ignoresDirectoriesAndHiddenFiles() throws IOException {
++        Path dataPath = Paths.get(TEST_DATA_DIR);
++        Files.createDirectories(dataPath.resolve("nested"));
++        Files.writeString(dataPath.resolve(".hidden.txt"), "secret");
++
++        List<String> files = fileCatalog.listFiles();
++
++        assertFalse(files.contains("nested"));
++        assertFalse(files.contains(".hidden.txt"));
++    }
++
++    @Test
++    void missingDataDirectory_printsWarningAndReturnsEmptyList() throws IOException {
++        tearDown();
++
++        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
++        PrintStream originalErr = System.err;
++        System.setErr(new PrintStream(errContent));
++        try {
++            FileCatalog missingCatalog = new FileCatalog();
++            assertTrue(missingCatalog.listFiles().isEmpty());
++            assertTrue(errContent.toString().contains("Could not locate 'data' directory."));
++        } finally {
++            System.setErr(originalErr);
++        }
++    }
++}
+Index: src/main/java/CipherService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.io.File;\r\nimport java.io.IOException;\r\nimport java.util.Map;\r\n\r\npublic class CipherService {\r\n    private static final String DEFAULT_KEY_PATH = \"ciphers/key.txt\";\r\n    private final FileReaderService fileReader;\r\n\r\n    public CipherService() {\r\n        this.fileReader = new FileReaderService();\r\n    }\r\n\r\n    public CipherService(FileReaderService fileReader) {\r\n        this.fileReader = fileReader;\r\n    }\r\n\r\n    public String loadKey() {\r\n        return readAndValidate(resolveDefaultKeyPath());\r\n    }\r\n\r\n    public String loadKey(String keyPath) {\r\n        String content = null;\r\n        if (keyPath != null && !keyPath.isBlank()) {\r\n            content = readAndValidate(keyPath);\r\n        }\r\n        if (content == null) {\r\n            content = readAndValidate(resolveDefaultKeyPath());\r\n        }\r\n        return content;\r\n    }\r\n\r\n    public String decrypt(String input, String keyContent) {\r\n        if (input == null || input.isEmpty()) {\r\n            return \"\";\r\n        }\r\n\r\n        CipherKey key = new CipherKey(keyContent);\r\n        if (!key.validate()) {\r\n            return \"Invalid key\";\r\n        }\r\n\r\n        return applyMapping(input, key.getMapping());\r\n    }\r\n\r\n    private String applyMapping(String input, Map<Character, Character> mapping) {\r\n        StringBuilder output = new StringBuilder(input.length());\r\n        for (int i = 0; i < input.length(); i++) {\r\n            char ch = input.charAt(i);\r\n            Character mapped = mapping.get(ch);\r\n            output.append(mapped != null ? mapped : ch);\r\n        }\r\n        return output.toString();\r\n    }\r\n\r\n    private String resolveDefaultKeyPath() {\r\n        String[] candidates = new String[] {\r\n            \"./ciphers/key.txt\",\r\n            \"./build/../ciphers/key.txt\",\r\n            \"ciphers/key.txt\"\r\n        };\r\n\r\n        for (String candidate : candidates) {\r\n            File file = new File(candidate);\r\n            if (file.exists() && file.isFile()) {\r\n                return candidate;\r\n            }\r\n        }\r\n\r\n        return DEFAULT_KEY_PATH;\r\n    }\r\n\r\n    private String readAndValidate(String path) {\r\n        if (path == null || path.isBlank()) {\r\n            return null;\r\n        }\r\n        String content;\r\n        try {\r\n            content = fileReader.readFile(path);\r\n        } catch (IOException e) {\r\n            return null;\r\n        }\r\n        CipherKey key = new CipherKey(content);\r\n        return key.validate() ? content : null;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/CipherService.java b/src/main/java/CipherService.java
+--- a/src/main/java/CipherService.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/main/java/CipherService.java	(date 1770924023356)
+@@ -1,8 +1,9 @@
+ import java.io.File;
+ import java.io.IOException;
+ import java.util.Map;
++import interfaces.CipherServiceInterface;
+ 
+-public class CipherService {
++public class CipherService implements CipherServiceInterface {
+     private static final String DEFAULT_KEY_PATH = "ciphers/key.txt";
+     private final FileReaderService fileReader;
+ 
+@@ -19,14 +20,10 @@
+     }
+ 
+     public String loadKey(String keyPath) {
+-        String content = null;
+-        if (keyPath != null && !keyPath.isBlank()) {
+-            content = readAndValidate(keyPath);
++        if (keyPath == null || keyPath.isBlank()) {
++            return null;
+         }
+-        if (content == null) {
+-            content = readAndValidate(resolveDefaultKeyPath());
+-        }
+-        return content;
++        return readAndValidate(keyPath);
+     }
+ 
+     public String decrypt(String input, String keyContent) {
+Index: docs/cipher.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Cipher Decoding and Key Validation (Team D)\r\n\r\nResponsibility\r\n\r\n- Load cipher keys (default or user-provided) and validate the key mapping.\r\n- Decipher file contents using a validated CipherKey mapping.\r\n- Surface clear cipher-related errors (invalid key, missing key, bad format).\r\n- Do not read mission files or list directories (owned by File Handler).\r\n- Do not parse CLI args or print output (owned by UI / Program Control).\r\n\r\nInputs\r\n\r\n- Enciphered text content as a String (from ProgramController).\r\n- Optional keyPath as a String (from ProgramController) or default key location.\r\n- Key file content read as a String (provided by FileReaderService via ProgramController).\r\n\r\nOutputs\r\n\r\n- CipherKey object with mapping when key is valid.\r\n- Deciphered text as a String when ciphering is enabled and key is valid.\r\n- User-friendly error strings (or error signals) when key is invalid or decipher fails.\r\n\r\nInterface (proposed)\r\n\r\n- class CipherService\r\n\r\n  - CipherKey loadKey(String keyPath)\r\n  - String decipher(String input, CipherKey key)\r\n- class CipherKey\r\n\r\n  - Map<Character, Character> mapping\r\n  - boolean validate()\r\n\r\nBehavior\r\n\r\n- If ProgramController requests deciphering:\r\n\r\n  - Determine keyPath (use provided path if present, else default key path).\r\n  - Load key content (ProgramController uses FileReaderService; CipherService parses).\r\n  - Parse key content into mapping pairs (character-to-character).\r\n  - Build CipherKey and call validate().\r\n  - If valid: return CipherKey to ProgramController.\r\n- When decipher(input, key) is called:\r\n\r\n  - For each character in input:\r\n\r\n    - If character exists in key.mapping: replace using mapped value.\r\n    - Else: keep character unchanged (spaces, punctuation, newlines).\r\n  - Return the transformed (deciphered) output string.\r\n\r\nError Handling\r\n\r\n- Missing key file / unreadable key content: surface \"Invalid key\".\r\n- Key format invalid (unparseable lines, missing delimiter, empty mapping): \"Invalid key\".\r\n- Key validation fails (duplicate outputs, conflicting mappings, incomplete rules): \"Invalid key\".\r\n- Null/empty input to decipher: return empty string (no error).\r\n- If CipherKey is null or not validated before decipher: surface \"Invalid key\".\r\n\r\nTesting Ideas (TDD)\r\n\r\n- loadKey with default key path returns a validated CipherKey.\r\n- loadKey with a bad path or unreadable content results in \"Invalid key\".\r\n- loadKey rejects malformed key content (bad lines / missing pairs) with \"Invalid key\".\r\n- CipherKey.validate fails when mapping has duplicates or conflicts.\r\n- decipher replaces mapped letters and preserves punctuation/newlines unchanged.\r\n- decipher with valid key produces expected plaintext for a known ciphertext sample.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/cipher.txt b/docs/cipher.txt
+--- a/docs/cipher.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/cipher.txt	(date 1770924023351)
+@@ -16,16 +16,17 @@
+ 
+ Outputs
+ 
+-- CipherKey object with mapping when key is valid.
++- Validated key file content as String when key is valid.
+ - Deciphered text as a String when ciphering is enabled and key is valid.
+ - User-friendly error strings (or error signals) when key is invalid or decipher fails.
+ 
+-Interface (proposed)
++Interface
+ 
+ - class CipherService
+ 
+-  - CipherKey loadKey(String keyPath)
+-  - String decipher(String input, CipherKey key)
++  - String loadKey()
++  - String loadKey(String keyPath)
++  - String decrypt(String input, String keyContent)
+ - class CipherKey
+ 
+   - Map<Character, Character> mapping
+@@ -35,16 +36,17 @@
+ 
+ - If ProgramController requests deciphering:
+ 
+-  - Determine keyPath (use provided path if present, else default key path).
+-  - Load key content (ProgramController uses FileReaderService; CipherService parses).
++  - If no key path is provided, resolve default key in this order:
++    ./ciphers/key.txt, ./build/../ciphers/key.txt, ciphers/key.txt.
++  - If key path is provided, attempt that exact location only.
++  - Load key content (CipherService uses FileReaderService).
+   - Parse key content into mapping pairs (character-to-character).
+-  - Build CipherKey and call validate().
+-  - If valid: return CipherKey to ProgramController.
+-- When decipher(input, key) is called:
++  - Build CipherKey and call validate(); if valid, return key content; if invalid, return null.
++- When decrypt(input, keyContent) is called:
+ 
+   - For each character in input:
+ 
+-    - If character exists in key.mapping: replace using mapped value.
++    - If character exists in key mapping: replace using mapped value.
+     - Else: keep character unchanged (spaces, punctuation, newlines).
+   - Return the transformed (deciphered) output string.
+ 
+@@ -53,14 +55,14 @@
+ - Missing key file / unreadable key content: surface "Invalid key".
+ - Key format invalid (unparseable lines, missing delimiter, empty mapping): "Invalid key".
+ - Key validation fails (duplicate outputs, conflicting mappings, incomplete rules): "Invalid key".
+-- Null/empty input to decipher: return empty string (no error).
+-- If CipherKey is null or not validated before decipher: surface "Invalid key".
++- Null/empty input to decrypt: return empty string (no error).
++- If keyContent is null or not validated before decrypt: return "Invalid key".
+ 
+ Testing Ideas (TDD)
+ 
+-- loadKey with default key path returns a validated CipherKey.
++- loadKey with default key path returns validated key content.
+ - loadKey with a bad path or unreadable content results in "Invalid key".
+ - loadKey rejects malformed key content (bad lines / missing pairs) with "Invalid key".
+ - CipherKey.validate fails when mapping has duplicates or conflicts.
+-- decipher replaces mapped letters and preserves punctuation/newlines unchanged.
+-- decipher with valid key produces expected plaintext for a known ciphertext sample.
++- decrypt replaces mapped letters and preserves punctuation/newlines unchanged.
++- decrypt with valid key produces expected plaintext for a known ciphertext sample.
+Index: docs/readme.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>TopSecret HW 2 Readme\r\n\r\nGoal\r\n- Build a CLI tool to list mission files or display one file by number.\r\n- Support optional deciphering with a default or alternate key.\r\n\r\nTeam Roles\r\n- Team A: CLI parsing and user interaction.\r\n- Team B: File access and data listing.\r\n- Team C: Program control and coordination.\r\n- Team D: Cipher decoding and key validation (teams of four).\r\n\r\nArchitecture Overview\r\n- TopSecretApp parses args and delegates to ProgramController.\r\n- ProgramController requests file lists or contents from File Handler.\r\n- CipherService deciphers content when ciphering is enabled.\r\n- UI prints lists, file contents, or errors and exits.\r\n\r\nCore Classes And Members(Instance Variables and Methods)\r\n- TopSecretApp\r\n  - main(String[] args)\r\n  - ProgramController controller\r\n- ProgramController\r\n  - listFiles(): String\r\n  - showFile(int index, Optional<String> keyPath): String\r\n  - FileCatalog catalog\r\n  - FileReaderService reader\r\n  - CipherService cipher\r\n- FileCatalog\r\n  - listFiles(): List<String>\r\n  - getByIndex(int index): Optional<String>\r\n  - getByName(String filename): Optional<String>\r\n  - FileReaderService fileReader\r\n  - String dataDirectoryPath\r\n  - List<String> cachedFileList\r\n- FileReaderService\r\n  - readFile(String path): String throws IOException\r\n- CipherService\r\n  - loadKey(String keyPath): CipherKey\r\n  - decipher(String input, CipherKey key): String\r\n- CipherKey\r\n  - Map<Character, Character> mapping\r\n  - validate(): boolean\r\n\r\nProgram Flow\r\n- No args: list files -> print numbered list -> exit.\r\n- With index: read file -> optional decipher -> print content -> exit.\r\n\r\nCommand Usage\r\n- java topsecret\r\n- java topsecret <fileNumber> [keyPath]\r\n\r\nFile/Folder Layout\r\n- data/ (mission files)\r\n- ciphers/key.txt (cipher key)\r\n- docs/ (role documentation)\r\n\r\nTesting Approach (TDD)\r\n- Unit tests for file listing and file reading.\r\n- Unit tests for cipher validation and decoding.\r\n- Integration test for CLI end‑to‑end flow.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/readme.txt b/docs/readme.txt
+--- a/docs/readme.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/readme.txt	(date 1770924023356)
+@@ -11,13 +11,14 @@
+ - Team D: Cipher decoding and key validation (teams of four).
+ 
+ Architecture Overview
+-- TopSecretApp parses args and delegates to ProgramController.
++- TopSecret parses args and delegates to ProgramController.
+ - ProgramController requests file lists or contents from File Handler.
+ - CipherService deciphers content when ciphering is enabled.
+ - UI prints lists, file contents, or errors and exits.
+ 
+ Core Classes And Members(Instance Variables and Methods)
+-- TopSecretApp
++- TopSecret
++  - run(String[] args)
+   - main(String[] args)
+   - ProgramController controller
+ - ProgramController
+@@ -36,26 +37,36 @@
+ - FileReaderService
+   - readFile(String path): String throws IOException
+ - CipherService
+-  - loadKey(String keyPath): CipherKey
+-  - decipher(String input, CipherKey key): String
++  - loadKey(): String
++  - loadKey(String keyPath): String
++  - decrypt(String input, String keyContent): String
+ - CipherKey
+   - Map<Character, Character> mapping
+   - validate(): boolean
+ 
+ Program Flow
+ - No args: list files -> print numbered list -> exit.
+-- With index: read file -> optional decipher -> print content -> exit.
++- With index: read file -> decipher using default key (or provided key path) -> print content -> exit.
+ 
+ Command Usage
+-- java topsecret
+-- java topsecret <fileNumber> [keyPath]
++- java TopSecret
++- java TopSecret <fileNumber> [keyPath]
+ 
+ File/Folder Layout
+-- data/ (mission files)
+-- ciphers/key.txt (cipher key)
++- data/ mission files. Resolved in this order: ./data, ./build/../data, data.
++- ciphers/key.txt default key file. Resolved in this order: ./ciphers/key.txt, ./build/../ciphers/key.txt, ciphers/key.txt.
++- Optional alternate key path: second command argument, e.g. ciphers/custom.txt.
+ - docs/ (role documentation)
+ 
++Error Behavior
++- Missing or invalid mission file index: "File not found".
++- Invalid file number format: "Invalid file number".
++- Missing or invalid alternate key path (second argument): "Invalid key".
++- Missing data directory: warning on stderr, file list may be empty.
++- Decrypt runtime failure: "Decryption failed".
++
+ Testing Approach (TDD)
+-- Unit tests for file listing and file reading.
+-- Unit tests for cipher validation and decoding.
+-- Integration test for CLI end‑to‑end flow.
++- Unit tests cover non-getter/setter methods in TopSecret, ProgramController, FileCatalog,
++  FileReaderService, CipherService, and CipherKey.
++- Includes normal, edge, and failure path tests.
++- Includes Mockito-based tests in ProgramController and CipherService tests.
+Index: docs/filehandler.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>File Handler Plan (Team B)\r\n\r\nResponsibility\r\n- Own all direct file system access for data files.\r\n- Provide program control a clean API: list available files and return contents.\r\n- Keep data folder location flexible (project root /data or working‑dir /data).\r\n\r\nInputs\r\n- Requests to list files.\r\n- Requests to read a file by index or filename.\r\n\r\nOutputs\r\n- Sorted list of filenames.\r\n- Raw file contents as a String (via Optional).\r\n\r\nInterface (proposed)\r\n- class FileCatalog\r\n  - List<String> listFiles()\r\n  - Optional<String> getByIndex(int index)\r\n  - Optional<String> getByName(String filename)\r\n- class FileReaderService\r\n  - String readFile(String path) throws IOException\r\n\r\nBehavior\r\n- Resolve data directory in this order:\r\n  1) ./data (project root).\r\n  2) ./build/../data if running from build (fallback).\r\n  3) working‑dir/data (same folder as program).\r\n- If no data directory is found, warn on stderr and default to ./data.\r\n- listFiles() refreshes the cached list each call, returns sorted filenames\r\n  (case‑insensitive) without indices.\r\n- getByIndex() maps 1‑based input into the cached list and reads by filename.\r\n- getByName() builds a full path and reads the file contents.\r\n- readFile() returns raw file contents (no decipher here) or throws IOException\r\n  if the path is missing or a directory.\r\n\r\nError Handling\r\n- If data directory missing: print a warning; listFiles() may return empty.\r\n- If file cannot be read: log to stderr in FileCatalog and return Optional.empty().\r\n- FileReaderService throws IOException for missing paths or directories.\r\n\r\nTesting Ideas (TDD)\r\n- listFiles() on empty data dir returns empty list.\r\n- listFiles() returns sorted order without indices.\r\n- getByIndex() with invalid index returns empty Optional.\r\n- getByName() returns empty Optional on read error.\r\n- readFile() returns exact file contents or throws IOException.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/filehandler.txt b/docs/filehandler.txt
+--- a/docs/filehandler.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/filehandler.txt	(date 1770924023351)
+@@ -1,7 +1,7 @@
+ File Handler Plan (Team B)
+ 
+ Responsibility
+-- Own all direct file system access for data files.
++- Own all direct file system access for mission data files.
+ - Provide program control a clean API: list available files and return contents.
+ - Keep data folder location flexible (project root /data or working‑dir /data).
+ 
+@@ -13,7 +13,7 @@
+ - Sorted list of filenames.
+ - Raw file contents as a String (via Optional).
+ 
+-Interface (proposed)
++Interface
+ - class FileCatalog
+   - List<String> listFiles()
+   - Optional<String> getByIndex(int index)
+@@ -39,6 +39,10 @@
+ - If file cannot be read: log to stderr in FileCatalog and return Optional.empty().
+ - FileReaderService throws IOException for missing paths or directories.
+ 
++Storage Notes
++- Mission text files are expected in the `data/` directory at project root.
++- The path resolution order allows running from IDE, command line, or Gradle without hardcoded absolute paths.
++
+ Testing Ideas (TDD)
+ - listFiles() on empty data dir returns empty list.
+ - listFiles() returns sorted order without indices.
+Index: docs/programcontrol.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Program Control Plan (Team C)\r\n\r\nResponsibility\r\n- Orchestrate program flow based on CLI arguments.\r\n- Request file lists and contents from the File Handler.\r\n- Pass raw content to Cipher (if enabled) and return readable output.\r\n- Do not access the file system directly.\r\n\r\nInputs\r\n- CLI arguments: [fileNumber], [optional keyPath].\r\n- File list and file contents from File Handler.\r\n- Cipher key path or content when ciphering is enabled.\r\n\r\nOutputs\r\n- Numbered list of available files.\r\n- File contents (plain or deciphered).\r\n- User‑friendly error messages.\r\n\r\nInterface (proposed)\r\n- class ProgramController\r\n  - String listFiles()\r\n  - String showFile(int index, Optional<String> keyPath)\r\n  - FileCatalog catalog\r\n  - FileReaderService reader\r\n  - CipherService cipher\r\n\r\nBehavior\r\n- If no args: request listFiles() from File Handler and format numbered list.\r\n- If fileNumber provided: fetch file by index, read contents.\r\n- If ciphering enabled: load key (default or provided) and decipher content.\r\n- Return output string to UI layer for printing.\r\n\r\nError Handling\r\n- If file list is empty: return \"No files available\".\r\n- If index invalid: return \"Invalid file number\".\r\n- If file read fails: return \"Unable to read file\".\r\n- If cipher key invalid or missing: return \"Invalid key\".\r\n\r\nTesting Ideas (TDD)\r\n- No args returns numbered list from File Handler.\r\n- Empty file list returns \"No files available\".\r\n- Invalid index returns error message.\r\n- Valid index returns file content.\r\n- Cipher enabled with valid key returns deciphered text.\r\n- Cipher enabled with invalid key returns error message.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/programcontrol.txt b/docs/programcontrol.txt
+--- a/docs/programcontrol.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/programcontrol.txt	(date 1770924023356)
+@@ -16,7 +16,7 @@
+ - File contents (plain or deciphered).
+ - User‑friendly error messages.
+ 
+-Interface (proposed)
++Interface
+ - class ProgramController
+   - String listFiles()
+   - String showFile(int index, Optional<String> keyPath)
+@@ -27,18 +27,20 @@
+ Behavior
+ - If no args: request listFiles() from File Handler and format numbered list.
+ - If fileNumber provided: fetch file by index, read contents.
+-- If ciphering enabled: load key (default or provided) and decipher content.
++- If no key path is provided: load default key and decipher content.
++- If key path is provided: load that exact key path; if unreadable or invalid, return "Invalid key".
+ - Return output string to UI layer for printing.
+ 
+ Error Handling
+-- If file list is empty: return "No files available".
+-- If index invalid: return "Invalid file number".
+-- If file read fails: return "Unable to read file".
++- If file list is empty: return "No files found.".
++- If index invalid: return "File not found".
++- If file read fails or file cannot be resolved: return "File not found".
+ - If cipher key invalid or missing: return "Invalid key".
++- If cipher throws unexpectedly: return "Decryption failed".
+ 
+ Testing Ideas (TDD)
+ - No args returns numbered list from File Handler.
+-- Empty file list returns "No files available".
++- Empty file list returns "No files found.".
+ - Invalid index returns error message.
+ - Valid index returns file content.
+ - Cipher enabled with valid key returns deciphered text.
+Index: docs/Classes_Documentation/TopSecret.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Team: 2-4 TopSecret UML\r\n\r\nclass TopSecret\r\n    /*\r\n    This class is intended to serve as the main entry point for the TopSecret command-line program.\r\n    It will handle argument parsing and delegate tasks to the ProgramController.\r\n    */\r\n    +main(args: String[]): void
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/Classes_Documentation/TopSecret.txt b/docs/Classes_Documentation/TopSecret.txt
+--- a/docs/Classes_Documentation/TopSecret.txt	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/docs/Classes_Documentation/TopSecret.txt	(date 1770924023351)
+@@ -2,7 +2,10 @@
+ 
+ class TopSecret
+     /*
+-    This class is intended to serve as the main entry point for the TopSecret command-line program.
+-    It will handle argument parsing and delegate tasks to the ProgramController.
++    Main CLI entry point.
++    Parses command-line arguments and prints ProgramController output.
+     */
+-    +main(args: String[]): void
+\ No newline at end of file
++    -controller: ProgramController
++    +setControllerForTests(c: ProgramController): void
++    +run(args: String[]): void
++    +main(args: String[]): void
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"b3a74c04-e873-4a06-ac11-b14ca35e2423\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/gradle.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/gradle.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"ExternalProjectsData\">\r\n    <projectState path=\"$PROJECT_DIR$\">\r\n      <ProjectState />\r\n    </projectState>\r\n  </component>\r\n  <component name=\"ExternalProjectsManager\">\r\n    <system id=\"GRADLE\">\r\n      <state>\r\n        <projects_view>\r\n          <tree_state>\r\n            <expand>\r\n              <path>\r\n                <item name=\"\" type=\"6a2764b6:ExternalProjectsStructure$RootNode\" />\r\n                <item name=\"TopSecret\" type=\"f1a62948:ProjectNode\" />\r\n              </path>\r\n            </expand>\r\n            <select />\r\n          </tree_state>\r\n        </projects_view>\r\n      </state>\r\n    </system>\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"JUnit5 Test Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\"><![CDATA[{\r\n  \"lastFilter\": {\r\n    \"state\": \"OPEN\",\r\n    \"assignee\": \"BradleyE99\"\r\n  }\r\n}]]></component>\r\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\r\n  \"selectedUrlAndAccountId\": {\r\n    \"url\": \"https://github.com/UVA-CS-SDE-Sp26/ts-1-2-4.git\",\r\n    \"accountId\": \"807f6dc1-d9c0-49fb-a808-cf5416980e3f\"\r\n  }\r\n}]]></component>\r\n  <component name=\"GradleScriptDefinitionsStorage\" workingDir=\"$PROJECT_DIR$\" gradleHome=\"C:\\Users\\bradl\\.gradle\\wrapper\\dists\\gradle-9.2.0-bin\\11i5gvueggl8a5cioxuftxrik\\gradle-9.2.0\" javaHome=\"C:\\Program Files\\BellSoft\\LibericaJDK-25\" gradleVersion=\"9.2.0\" />\r\n  <component name=\"ProjectColorInfo\"><![CDATA[{\r\n  \"associatedIndex\": 2\r\n}]]></component>\r\n  <component name=\"ProjectId\" id=\"39a8aEbLV7zB5V9dlG0c51G3Oe1\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Gradle.FileCatalogTest.executor\": \"Run\",\r\n    \"Gradle.FileReaderServiceTest.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"RunOnceActivity.typescript.service.memoryLimit.init\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1\": \"true\",\r\n    \"com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary\": \"JUnit5\",\r\n    \"com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5\": \"\",\r\n    \"git-widget-placeholder\": \"main\",\r\n    \"junie.onboarding.icon.badge.shown\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"settings.editor.selected.configurable\": \"preferences.lookFeel\",\r\n    \"to.speed.mode.migration.done\": \"true\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateTestDialog.Recents.Supers\">\r\n      <recent name=\"\" />\r\n    </key>\r\n    <key name=\"CreateTestDialog.RecentsKey\">\r\n      <recent name=\"\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"Gradle.FileCatalogTest\">\r\n    <configuration name=\"FileCatalogTest\" type=\"GradleRunConfiguration\" factoryName=\"Gradle\" temporary=\"true\">\r\n      <ExternalSystemSettings>\r\n        <option name=\"executionName\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"externalSystemIdString\" value=\"GRADLE\" />\r\n        <option name=\"scriptParameters\" value=\"\" />\r\n        <option name=\"taskDescriptions\">\r\n          <list />\r\n        </option>\r\n        <option name=\"taskNames\">\r\n          <list>\r\n            <option value=\":test\" />\r\n            <option value=\"--tests\" />\r\n            <option value=\"&quot;FileCatalogTest&quot;\" />\r\n          </list>\r\n        </option>\r\n        <option name=\"vmOptions\" />\r\n      </ExternalSystemSettings>\r\n      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>\r\n      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>\r\n      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>\r\n      <DebugAllEnabled>false</DebugAllEnabled>\r\n      <RunAsTest>true</RunAsTest>\r\n      <GradleProfilingDisabled>false</GradleProfilingDisabled>\r\n      <GradleCoverageDisabled>false</GradleCoverageDisabled>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"FileReaderServiceTest\" type=\"GradleRunConfiguration\" factoryName=\"Gradle\" temporary=\"true\">\r\n      <ExternalSystemSettings>\r\n        <option name=\"executionName\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"externalSystemIdString\" value=\"GRADLE\" />\r\n        <option name=\"scriptParameters\" value=\"\" />\r\n        <option name=\"taskDescriptions\">\r\n          <list />\r\n        </option>\r\n        <option name=\"taskNames\">\r\n          <list>\r\n            <option value=\":test\" />\r\n            <option value=\"--tests\" />\r\n            <option value=\"&quot;FileReaderServiceTest&quot;\" />\r\n          </list>\r\n        </option>\r\n        <option name=\"vmOptions\" />\r\n      </ExternalSystemSettings>\r\n      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>\r\n      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>\r\n      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>\r\n      <DebugAllEnabled>false</DebugAllEnabled>\r\n      <RunAsTest>true</RunAsTest>\r\n      <GradleProfilingDisabled>false</GradleProfilingDisabled>\r\n      <GradleCoverageDisabled>false</GradleCoverageDisabled>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Gradle.FileCatalogTest\" />\r\n        <item itemvalue=\"Gradle.FileReaderServiceTest\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240\" />\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"b3a74c04-e873-4a06-ac11-b14ca35e2423\" name=\"Changes\" comment=\"\" />\r\n      <created>1770922884684</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1770922884684</updated>\r\n      <workItem from=\"1770922886369\" duration=\"752000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/.idea/workspace.xml	(date 1770924075738)
+@@ -4,11 +4,7 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="b3a74c04-e873-4a06-ac11-b14ca35e2423" name="Changes" comment="">
+-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-    </list>
++    <list default="true" id="b3a74c04-e873-4a06-ac11-b14ca35e2423" name="Changes" comment="" />
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -22,6 +18,9 @@
+   <component name="ExternalProjectsManager">
+     <system id="GRADLE">
+       <state>
++        <task path="$PROJECT_DIR$">
++          <activation />
++        </task>
+         <projects_view>
+           <tree_state>
+             <expand>
+@@ -46,50 +45,36 @@
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+-  "lastFilter": {
+-    "state": "OPEN",
+-    "assignee": "BradleyE99"
+-  }
+-}]]></component>
+-  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-  "selectedUrlAndAccountId": {
+-    "url": "https://github.com/UVA-CS-SDE-Sp26/ts-1-2-4.git",
+-    "accountId": "807f6dc1-d9c0-49fb-a808-cf5416980e3f"
+-  }
+-}]]></component>
+-  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="C:\Users\bradl\.gradle\wrapper\dists\gradle-9.2.0-bin\11i5gvueggl8a5cioxuftxrik\gradle-9.2.0" javaHome="C:\Program Files\BellSoft\LibericaJDK-25" gradleVersion="9.2.0" />
+-  <component name="ProjectColorInfo"><![CDATA[{
+-  "associatedIndex": 2
+-}]]></component>
+-  <component name="ProjectId" id="39a8aEbLV7zB5V9dlG0c51G3Oe1" />
+-  <component name="ProjectViewState">
+-    <option name="hideEmptyMiddlePackages" value="true" />
+-    <option name="showLibraryContents" value="true" />
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/UVA-CS-SDE-Sp26/ts-1-2-4.git&quot;,
++    &quot;accountId&quot;: &quot;a030850d-d692-4c25-9268-83fb17ae8229&quot;
++  }
++}</component>
++  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.2.0-bin/11i5gvueggl8a5cioxuftxrik/gradle-9.2.0" javaHome="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home" gradleVersion="9.2.0" />
++  <component name="MacroExpansionManager">
++    <option name="directoryName" value="S4nfrPyW" />
++  </component>
++  <component name="McpProjectServerCommands">
++    <commands />
++    <urls />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Gradle.FileCatalogTest.executor": "Run",
+-    "Gradle.FileReaderServiceTest.executor": "Run",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.git.unshallow": "true",
+-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+-    "git-widget-placeholder": "main",
+-    "junie.onboarding.icon.badge.shown": "true",
+-    "kotlin-language-version-configured": "true",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "settings.editor.selected.configurable": "preferences.lookFeel",
+-    "to.speed.mode.migration.done": "true",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Gradle.FileCatalogTest.executor&quot;: &quot;Run&quot;,
++    &quot;Gradle.FileReaderServiceTest.executor&quot;: &quot;Run&quot;,
++    &quot;Gradle.HW2IntegrationTest.listFiles_integration.executor&quot;: &quot;Run&quot;,
++    &quot;Gradle.HW2IntegrationTest.showFile_integration_withKey.executor&quot;: &quot;Run&quot;,
++    &quot;Gradle.ProgramControllerTest.listFiles.executor&quot;: &quot;Run&quot;,
++    &quot;Gradle.ProgramControllerTest.showFile.executor&quot;: &quot;Run&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
++    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
++    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RecentsManager">
+     <key name="CreateTestDialog.Recents.Supers">
+       <recent name="" />
+@@ -98,7 +83,7 @@
+       <recent name="" />
+     </key>
+   </component>
+-  <component name="RunManager" selected="Gradle.FileCatalogTest">
++  <component name="RunManager" selected="Gradle.HW2IntegrationTest.showFile_integration_withKey">
+     <configuration name="FileCatalogTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+       <ExternalSystemSettings>
+         <option name="executionName" />
+@@ -126,7 +111,7 @@
+       <GradleCoverageDisabled>false</GradleCoverageDisabled>
+       <method v="2" />
+     </configuration>
+-    <configuration name="FileReaderServiceTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
++    <configuration name="HW2IntegrationTest.listFiles_integration" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+       <ExternalSystemSettings>
+         <option name="executionName" />
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+@@ -139,7 +124,88 @@
+           <list>
+             <option value=":test" />
+             <option value="--tests" />
+-            <option value="&quot;FileReaderServiceTest&quot;" />
++            <option value="&quot;HW2IntegrationTest.listFiles_integration&quot;" />
++          </list>
++        </option>
++        <option name="vmOptions" />
++      </ExternalSystemSettings>
++      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
++      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
++      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
++      <DebugAllEnabled>false</DebugAllEnabled>
++      <RunAsTest>true</RunAsTest>
++      <GradleProfilingDisabled>false</GradleProfilingDisabled>
++      <GradleCoverageDisabled>false</GradleCoverageDisabled>
++      <method v="2" />
++    </configuration>
++    <configuration name="HW2IntegrationTest.showFile_integration_withKey" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
++      <ExternalSystemSettings>
++        <option name="executionName" />
++        <option name="externalProjectPath" value="$PROJECT_DIR$" />
++        <option name="externalSystemIdString" value="GRADLE" />
++        <option name="scriptParameters" value="" />
++        <option name="taskDescriptions">
++          <list />
++        </option>
++        <option name="taskNames">
++          <list>
++            <option value=":test" />
++            <option value="--tests" />
++            <option value="&quot;HW2IntegrationTest.showFile_integration_withKey&quot;" />
++          </list>
++        </option>
++        <option name="vmOptions" />
++      </ExternalSystemSettings>
++      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
++      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
++      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
++      <DebugAllEnabled>false</DebugAllEnabled>
++      <RunAsTest>true</RunAsTest>
++      <GradleProfilingDisabled>false</GradleProfilingDisabled>
++      <GradleCoverageDisabled>false</GradleCoverageDisabled>
++      <method v="2" />
++    </configuration>
++    <configuration name="ProgramControllerTest.listFiles" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
++      <ExternalSystemSettings>
++        <option name="executionName" />
++        <option name="externalProjectPath" value="$PROJECT_DIR$" />
++        <option name="externalSystemIdString" value="GRADLE" />
++        <option name="scriptParameters" value="" />
++        <option name="taskDescriptions">
++          <list />
++        </option>
++        <option name="taskNames">
++          <list>
++            <option value=":test" />
++            <option value="--tests" />
++            <option value="&quot;ProgramControllerTest.listFiles&quot;" />
++          </list>
++        </option>
++        <option name="vmOptions" />
++      </ExternalSystemSettings>
++      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
++      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
++      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
++      <DebugAllEnabled>false</DebugAllEnabled>
++      <RunAsTest>true</RunAsTest>
++      <GradleProfilingDisabled>false</GradleProfilingDisabled>
++      <GradleCoverageDisabled>false</GradleCoverageDisabled>
++      <method v="2" />
++    </configuration>
++    <configuration name="ProgramControllerTest.showFile" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
++      <ExternalSystemSettings>
++        <option name="executionName" />
++        <option name="externalProjectPath" value="$PROJECT_DIR$" />
++        <option name="externalSystemIdString" value="GRADLE" />
++        <option name="scriptParameters" value="" />
++        <option name="taskDescriptions">
++          <list />
++        </option>
++        <option name="taskNames">
++          <list>
++            <option value=":test" />
++            <option value="--tests" />
++            <option value="&quot;ProgramControllerTest.showFile&quot;" />
+           </list>
+         </option>
+         <option name="vmOptions" />
+@@ -155,31 +221,15 @@
+     </configuration>
+     <recent_temporary>
+       <list>
++        <item itemvalue="Gradle.HW2IntegrationTest.showFile_integration_withKey" />
++        <item itemvalue="Gradle.HW2IntegrationTest.listFiles_integration" />
++        <item itemvalue="Gradle.ProgramControllerTest.showFile" />
++        <item itemvalue="Gradle.ProgramControllerTest.listFiles" />
+         <item itemvalue="Gradle.FileCatalogTest" />
+-        <item itemvalue="Gradle.FileReaderServiceTest" />
+       </list>
+     </recent_temporary>
+   </component>
+-  <component name="SharedIndexes">
+-    <attachedChunks>
+-      <set>
+-        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
+-      </set>
+-    </attachedChunks>
+-  </component>
+   <component name="TaskManager">
+-    <task active="true" id="Default" summary="Default task">
+-      <changelist id="b3a74c04-e873-4a06-ac11-b14ca35e2423" name="Changes" comment="" />
+-      <created>1770922884684</created>
+-      <option name="number" value="Default" />
+-      <option name="presentableId" value="Default" />
+-      <updated>1770922884684</updated>
+-      <workItem from="1770922886369" duration="752000" />
+-    </task>
+     <servers />
+   </component>
+-  <component name="TypeScriptGeneratedFilesManager">
+-    <option name="version" value="3" />
+-  </component>
+ </project>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"FrameworkDetectionExcludesConfiguration\">\r\n    <file type=\"web\" url=\"file://$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"KubernetesApiProvider\">{}</component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" project-jdk-name=\"25\" project-jdk-type=\"JavaSDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/.idea/misc.xml	(date 1770924050267)
+@@ -4,6 +4,6 @@
+   <component name="FrameworkDetectionExcludesConfiguration">
+     <file type="web" url="file://$PROJECT_DIR$" />
+   </component>
+-  <component name="KubernetesApiProvider">{}</component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" project-jdk-name="25" project-jdk-type="JavaSDK" />
++  <component name="KubernetesApiProvider"><![CDATA[{}]]></component>
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="25" project-jdk-type="JavaSDK" />
+ </project>
+\ No newline at end of file
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleMigrationSettings\" migrationVersion=\"1\" />\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"gradleJvm\" value=\"#JAVA_HOME\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n          </set>\r\n        </option>\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+--- a/.idea/gradle.xml	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/.idea/gradle.xml	(date 1770924023346)
+@@ -5,7 +5,6 @@
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+-        <option name="gradleJvm" value="#JAVA_HOME" />
+         <option name="modules">
+           <set>
+             <option value="$PROJECT_DIR$" />
+Index: src/main/java/interfaces/CipherServiceInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package interfaces;\r\n\r\npublic interface CipherServiceInterface {\r\n    CipherKeyInterface loadKey(String keyPath);\r\n    String decipher(String input, CipherKeyInterface key);\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/interfaces/CipherServiceInterface.java b/src/main/java/interfaces/CipherServiceInterface.java
+--- a/src/main/java/interfaces/CipherServiceInterface.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/main/java/interfaces/CipherServiceInterface.java	(date 1770924023356)
+@@ -1,6 +1,7 @@
+ package interfaces;
+ 
+ public interface CipherServiceInterface {
+-    CipherKeyInterface loadKey(String keyPath);
+-    String decipher(String input, CipherKeyInterface key);
+-}
+\ No newline at end of file
++    String loadKey();
++    String loadKey(String keyPath);
++    String decrypt(String input, String keyContent);
++}
+Index: src/test/java/TopSecretTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.junit.jupiter.api.AfterEach;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport java.io.ByteArrayOutputStream;\r\nimport java.io.PrintStream;\r\nimport java.util.Optional;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\nclass TopSecretTest {\r\n\r\n    private PrintStream originalOut;\r\n    private ByteArrayOutputStream outContent;\r\n\r\n    /**\r\n     * Fake controller used for testing. This allows us to isolate testing without depending on real\r\n     * file tests from depending on real life reading or cipher logic.\r\n     *\r\n     * Allows us to:\r\n     * - Control return values\r\n     * - Track method calls\r\n     **/\r\n    static class FakeProgramController extends ProgramController {\r\n        String lastShowFileIndex = null;\r\n        Optional<String> lastKeyPath = null; // Value might not exist\r\n\r\n\r\n        /**\r\n         * Creates a fake controller.\r\n         * Passes null dependencies since overridden methods do not use them.\r\n         */\r\n        FakeProgramController() {\r\n            super(null, null, null); // OK for tests since we override methods we use\r\n        }\r\n\r\n\r\n        /**\r\n         * Simulates listing available files.\r\n         *\r\n         * @return mock file list string\r\n         */\r\n        @Override\r\n        public String listFiles() {\r\n            return \"01 filea.txt\\n02 fileb.txt\\n\";\r\n        }\r\n\r\n\r\n        /**\r\n         * Simulates displaying a file.\r\n         * Records inputs so tests can verify correct argument parsing.\r\n         *\r\n         * @param index   file number\r\n         * @param keyPath optional key path\r\n         * @return mock file content string\r\n         */\r\n        @Override\r\n        public String showFile(int index, Optional<String> keyPath) {\r\n            lastShowFileIndex = String.valueOf(index);\r\n            lastKeyPath = keyPath;\r\n            return \"FILE_CONTENT_\" + index;\r\n        }\r\n    }\r\n\r\n    // Run this method before every test\r\n    @BeforeEach\r\n    void setUp() {\r\n        originalOut = System.out;\r\n        outContent = new ByteArrayOutputStream();\r\n        System.setOut(new PrintStream(outContent));\r\n    }\r\n\r\n\r\n    // Run this method after every test\r\n    @AfterEach\r\n    void tearDown() {\r\n        System.setOut(originalOut);\r\n    }\r\n\r\n    @Test\r\n    void noArgs_printsFileList() {\r\n        FakeProgramController fake = new FakeProgramController();\r\n        TopSecret.setControllerForTests(fake); // uses your test hook :contentReference[oaicite:4]{index=4}\r\n\r\n        TopSecret.main(new String[]{});\r\n\r\n        assertEquals(\"01 filea.txt\\n02 fileb.txt\", outContent.toString().trim());\r\n    }\r\n\r\n    @Test\r\n    void oneArg_parsesNumber_callsShowFile_withDefaultKey() {\r\n        FakeProgramController fake = new FakeProgramController();\r\n        TopSecret.setControllerForTests(fake);\r\n\r\n        TopSecret.main(new String[]{\"1\"}); // using \"1\" as numeric index per your controller signature :contentReference[oaicite:5]{index=5}\r\n\r\n        assertEquals(\"FILE_CONTENT_1\", outContent.toString().trim());\r\n        assertEquals(\"1\", fake.lastShowFileIndex);\r\n        assertTrue(fake.lastKeyPath.isEmpty(), \"Expected default keyPath (empty Optional)\");\r\n    }\r\n\r\n    @Test\r\n    void twoArgs_parsesNumber_callsShowFile_withProvidedKeyPath() {\r\n        FakeProgramController fake = new FakeProgramController();\r\n        TopSecret.setControllerForTests(fake);\r\n\r\n        TopSecret.main(new String[]{\"1\", \"ciphers/key.txt\"});\r\n\r\n        assertEquals(\"FILE_CONTENT_1\", outContent.toString().trim());\r\n        assertEquals(\"1\", fake.lastShowFileIndex);\r\n        assertTrue(fake.lastKeyPath.isPresent());\r\n        assertEquals(\"ciphers/key.txt\", fake.lastKeyPath.get());\r\n    }\r\n\r\n    @Test\r\n    void tooManyArgs_printsTooManyArgumentsError() {\r\n        FakeProgramController fake = new FakeProgramController();\r\n        TopSecret.setControllerForTests(fake);\r\n\r\n        TopSecret.main(new String[]{\"1\", \"key.txt\", \"extra\"});\r\n\r\n        assertEquals(\"Too many arguments\", outContent.toString().trim());\r\n    }\r\n\r\n    @Test\r\n    void invalidFileNumberFormat_printsInvalidFileNumberError() {\r\n        FakeProgramController fake = new FakeProgramController();\r\n        TopSecret.setControllerForTests(fake);\r\n\r\n        TopSecret.main(new String[]{\"abc\"});\r\n\r\n        assertEquals(\"Invalid file number\", outContent.toString().trim());\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/TopSecretTest.java b/src/test/java/TopSecretTest.java
+--- a/src/test/java/TopSecretTest.java	(revision 21a06decbd516dc58fe6d9aa3e202702385ed96c)
++++ b/src/test/java/TopSecretTest.java	(date 1770924023356)
+@@ -131,4 +131,16 @@
+ 
+         assertEquals("Invalid file number", outContent.toString().trim());
+     }
++
++    @Test
++    void run_acceptsNegativeNumberAndDelegatesToController() {
++        FakeProgramController fake = new FakeProgramController();
++        TopSecret.setControllerForTests(fake);
++
++        TopSecret app = new TopSecret();
++        app.run(new String[]{"-1"});
++
++        assertEquals("FILE_CONTENT_-1", outContent.toString().trim());
++        assertEquals("-1", fake.lastShowFileIndex);
++    }
+ }
+diff --git a/.ai/mcp/mcp.json b/.ai/mcp/mcp.json
+new file mode 100644
