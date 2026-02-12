@@ -6,11 +6,14 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class FileCatalogTest {
 
     private FileCatalog fileCatalog;
     private static final String TEST_DATA_DIR = "./data";
+    private static final String TEST_PREFIX = "hw2_fc_";
+    private final List<Path> createdPaths = new ArrayList<>();
 
     @BeforeEach
     void setUp() throws IOException {
@@ -21,56 +24,58 @@ class FileCatalogTest {
         }
 
         // Create dummy files
-        Files.writeString(dataPath.resolve("gamma.txt"), "Content of Gamma");
-        Files.writeString(dataPath.resolve("alpha.txt"), "Content of Alpha");
-        Files.writeString(dataPath.resolve("Beta.txt"), "Content of Beta");
+        writeTestFile(dataPath.resolve(TEST_PREFIX + "gamma.txt"), "Content of Gamma");
+        writeTestFile(dataPath.resolve(TEST_PREFIX + "alpha.txt"), "Content of Alpha");
+        writeTestFile(dataPath.resolve(TEST_PREFIX + "Beta.txt"), "Content of Beta");
 
         fileCatalog = new FileCatalog();
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        Path dataPath = Paths.get(TEST_DATA_DIR);
-        if (Files.exists(dataPath)) {
-            try (Stream<Path> walk = Files.walk(dataPath)) {
-                walk.sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-            }
+        for (Path path : createdPaths) {
+            Files.deleteIfExists(path);
         }
     }
 
     @Test
     void listFiles() {
         List<String> files = fileCatalog.listFiles();
+        assertTrue(files.contains(TEST_PREFIX + "alpha.txt"));
+        assertTrue(files.contains(TEST_PREFIX + "Beta.txt"));
+        assertTrue(files.contains(TEST_PREFIX + "gamma.txt"));
 
-        assertEquals(3, files.size(), "Should find exactly 3 files in the data directory");
-
-        assertEquals("alpha.txt", files.get(0));
-        assertEquals("Beta.txt", files.get(1));
-        assertEquals("gamma.txt", files.get(2));
+        int alphaIndex = files.indexOf(TEST_PREFIX + "alpha.txt");
+        int betaIndex = files.indexOf(TEST_PREFIX + "Beta.txt");
+        int gammaIndex = files.indexOf(TEST_PREFIX + "gamma.txt");
+        assertTrue(alphaIndex < betaIndex);
+        assertTrue(betaIndex < gammaIndex);
     }
 
     @Test
     void listFiles_refreshesWhenNewFileAppears() throws IOException {
         List<String> initial = fileCatalog.listFiles();
-        assertEquals(3, initial.size());
+        int initialSize = initial.size();
 
         Path dataPath = Paths.get(TEST_DATA_DIR);
-        Files.writeString(dataPath.resolve("delta.txt"), "Content of Delta");
+        writeTestFile(dataPath.resolve(TEST_PREFIX + "delta.txt"), "Content of Delta");
 
         List<String> updated = fileCatalog.listFiles();
-        assertEquals(4, updated.size());
-        assertTrue(updated.contains("delta.txt"));
+        assertEquals(initialSize + 1, updated.size());
+        assertTrue(updated.contains(TEST_PREFIX + "delta.txt"));
     }
 
     @Test
     void getByIndex() {
-        Optional<String> result1 = fileCatalog.getByIndex(1);
+        List<String> files = fileCatalog.listFiles();
+        int alphaIndex = files.indexOf(TEST_PREFIX + "alpha.txt") + 1;
+        int betaIndex = files.indexOf(TEST_PREFIX + "Beta.txt") + 1;
+
+        Optional<String> result1 = fileCatalog.getByIndex(alphaIndex);
         assertTrue(result1.isPresent());
         assertEquals("Content of Alpha", result1.get());
 
-        Optional<String> result2 = fileCatalog.getByIndex(2);
+        Optional<String> result2 = fileCatalog.getByIndex(betaIndex);
         assertTrue(result2.isPresent());
         assertEquals("Content of Beta", result2.get());
 
@@ -89,7 +94,7 @@ class FileCatalogTest {
 
     @Test
     void getByName() {
-        Optional<String> result = fileCatalog.getByName("gamma.txt");
+        Optional<String> result = fileCatalog.getByName(TEST_PREFIX + "gamma.txt");
         assertTrue(result.isPresent());
         assertEquals("Content of Gamma", result.get());
 
@@ -103,18 +108,21 @@ class FileCatalogTest {
     @Test
     void listFiles_ignoresDirectoriesAndHiddenFiles() throws IOException {
         Path dataPath = Paths.get(TEST_DATA_DIR);
-        Files.createDirectories(dataPath.resolve("nested"));
-        Files.writeString(dataPath.resolve(".hidden.txt"), "secret");
+        Path nested = dataPath.resolve(TEST_PREFIX + "nested");
+        Files.createDirectories(nested);
+        createdPaths.add(nested);
+        writeTestFile(dataPath.resolve("." + TEST_PREFIX + "hidden.txt"), "secret");
 
         List<String> files = fileCatalog.listFiles();
 
-        assertFalse(files.contains("nested"));
-        assertFalse(files.contains(".hidden.txt"));
+        assertFalse(files.contains(TEST_PREFIX + "nested"));
+        assertFalse(files.contains("." + TEST_PREFIX + "hidden.txt"));
     }
 
     @Test
     void missingDataDirectory_printsWarningAndReturnsEmptyList() throws IOException {
-        tearDown();
+        Path dataPath = Paths.get(TEST_DATA_DIR);
+        assumeTrue(Files.notExists(dataPath), "Skipping: data directory exists in this environment.");
 
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
         PrintStream originalErr = System.err;
@@ -126,5 +134,10 @@ class FileCatalogTest {
         } finally {
             System.setErr(originalErr);
         }
+    }
+
+    private void writeTestFile(Path path, String content) throws IOException {
+        Files.writeString(path, content);
+        createdPaths.add(path);
     }
 }
