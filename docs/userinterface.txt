@@ -6,7 +6,7 @@ Responsibility
 - Do not read files directly or perform deciphering.
 
 Inputs
-- CLI arguments: none, [fileNumber], or [fileNumber] [keyPath].
+- CLI arguments: none, [fileNumber], or [fileNumber] [keyFilename].
 
 Outputs
 - Numbered list of available files.
@@ -23,7 +23,7 @@ Interface
 Behavior
 - If no args: call ProgramController.listFiles() and print result.
 - If one arg: parse file number, call ProgramController.showFile(index, empty).
-- If two args: parse number and key path, call ProgramController.showFile(index, keyPath).
+- If two args: parse number and key filename, call ProgramController.showFile(index, keyFilename).
 - Print output and exit.
 
 Error Handling
@@ -35,7 +35,7 @@ Error Handling
 Testing Ideas (TDD)
 - No args prints a numbered list.
 - One arg prints selected file content.
-- Two args uses alternate key path.
+- Two args uses alternate key filename from the ciphers folder.
 - Invalid number format prints error.
 - Too many args prints error.
 - Negative or non-standard numeric argument is still passed to ProgramController.

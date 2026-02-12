@@ -11,7 +11,7 @@ Responsibility
 Inputs
 
 - Enciphered text content as a String (from ProgramController).
-- Optional keyPath as a String (from ProgramController) or default key location.
+- Optional key filename as a String (from ProgramController) or default key location.
 - Key file content read as a String (provided by FileReaderService via ProgramController).
 
 Outputs
@@ -25,7 +25,7 @@ Interface
 - class CipherService
 
   - String loadKey()
-  - String loadKey(String keyPath)
+  - String loadKey(String keyFilename)
   - String decrypt(String input, String keyContent)
 - class CipherKey
 
@@ -36,9 +36,9 @@ Behavior
 
 - If ProgramController requests deciphering:
 
-  - If no key path is provided, resolve default key in this order:
+  - If no key filename is provided, resolve default key in this order:
     ./ciphers/key.txt, ./build/../ciphers/key.txt, ciphers/key.txt.
-  - If key path is provided, attempt that exact location only.
+  - If key filename is provided, read only from ./ciphers/<keyFilename>.
   - Load key content (CipherService uses FileReaderService).
   - Parse key content into mapping pairs (character-to-character).
   - Build CipherKey and call validate(); if valid, return key content; if invalid, return null.
@@ -60,7 +60,7 @@ Error Handling
 
 Testing Ideas (TDD)
 
-- loadKey with default key path returns validated key content.
+- loadKey with default key returns validated key content.
 - loadKey with a bad path or unreadable content results in "Invalid key".
 - loadKey rejects malformed key content (bad lines / missing pairs) with "Invalid key".
 - CipherKey.validate fails when mapping has duplicates or conflicts.

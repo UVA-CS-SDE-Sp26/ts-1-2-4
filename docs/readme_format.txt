@@ -74,7 +74,7 @@ Core Classes And Members(Instance Variables and Methods)
   - ProgramController controller
 - ProgramController
   - listFiles(): String
-  - showFile(int index, Optional<String> keyPath): String
+  - showFile(int index, Optional<String> keyFilename): String
   - FileCatalog catalog
   - FileReaderService reader
   - CipherService cipher
@@ -86,7 +86,7 @@ Core Classes And Members(Instance Variables and Methods)
   - readFile(String path): String
 - CipherService
   - loadKey(): String
-  - loadKey(String keyPath): String
+  - loadKey(String keyFilename): String
   - decrypt(String input, String keyContent): String
 - CipherKey
   - Map<Character, Character> mapping
@@ -98,7 +98,7 @@ Program Flow
 
 Command Usage
 - java TopSecret
-- java TopSecret <fileNumber> [keyPath]
+- java TopSecret <fileNumber> [keyFilename]
 
 File/Folder Layout
 - data/ (mission files)

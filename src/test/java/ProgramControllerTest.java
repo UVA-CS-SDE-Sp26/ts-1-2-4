@@ -64,7 +64,7 @@ class ProgramControllerTest {
     @Test
     void showFile_usesProvidedKeyPathWhenPresent() {
         int index = 1;
-        String keyPath = "ciphers/alternate.txt";
+        String keyPath = "alternate.txt";
         String encryptedContent = "ENCRYPTED";
         String expectedOutput = "DECRYPTED";
         FileCatalog catalog = mock(FileCatalog.class);

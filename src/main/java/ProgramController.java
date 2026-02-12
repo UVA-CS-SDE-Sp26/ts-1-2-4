@@ -30,13 +30,13 @@ public class ProgramController implements ProgramControllerInterface {
         }
         return outputString;
     }
-    public String showFile(int index, Optional<String> keyPath) {
+    public String showFile(int index, Optional<String> keyFilename) {
         Optional<String> fileContent = catalog.getByIndex(index);
         if (fileContent.isEmpty()) {
             return "File not found";
         }
         String content = fileContent.get();
-        String key = keyPath.isPresent() ? cipher.loadKey(keyPath.get()) : cipher.loadKey();
+        String key = keyFilename.isPresent() ? cipher.loadKey(keyFilename.get()) : cipher.loadKey();
         if (key == null) {
             return "Invalid key";
         }

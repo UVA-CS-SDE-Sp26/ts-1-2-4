@@ -87,7 +87,7 @@ class HW2IntegrationTest {
             new CipherService()
         );
 
-        String output = controller.showFile(index, Optional.of("ciphers/key.txt"));
+        String output = controller.showFile(index, Optional.of("key.txt"));
         assertEquals("abc", output);
     }
 
@@ -135,7 +135,7 @@ class HW2IntegrationTest {
             new CipherService()
         );
 
-        String output = controller.showFile(index, Optional.of("ciphers/does_not_exist.txt"));
+        String output = controller.showFile(index, Optional.of("does_not_exist.txt"));
         assertEquals("Invalid key", output);
     }
 
@@ -170,7 +170,7 @@ class HW2IntegrationTest {
             new CipherService()
         );
 
-        String output = controller.showFile(index, Optional.of("ciphers/key.txt"));
+        String output = controller.showFile(index, Optional.of("key.txt"));
         assertEquals("abc-!? 31\n", output);
     }
 
@@ -203,7 +203,7 @@ class HW2IntegrationTest {
         Path path = ciphersDir.resolve(filename);
         Files.writeString(path, content);
         createdPaths.add(path);
-        return ciphersDir.resolve(filename).toString();
+        return filename;
     }
 
     private String uniqueFilename(String baseName) throws IOException {

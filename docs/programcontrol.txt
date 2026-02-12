@@ -7,9 +7,9 @@ Responsibility
 - Do not access the file system directly.
 
 Inputs
-- CLI arguments: [fileNumber], [optional keyPath].
+- CLI arguments: [fileNumber], [optional keyFilename].
 - File list and file contents from File Handler.
-- Cipher key path or content when ciphering is enabled.
+- Optional cipher key filename when ciphering is enabled.
 
 Outputs
 - Numbered list of available files.
@@ -19,7 +19,7 @@ Outputs
 Interface
 - class ProgramController
   - String listFiles()
-  - String showFile(int index, Optional<String> keyPath)
+  - String showFile(int index, Optional<String> keyFilename)
   - FileCatalog catalog
   - FileReaderService reader
   - CipherService cipher
@@ -27,8 +27,8 @@ Interface
 Behavior
 - If no args: request listFiles() from File Handler and format numbered list.
 - If fileNumber provided: fetch file by index, read contents.
-- If no key path is provided: load default key and decipher content.
-- If key path is provided: load that exact key path; if unreadable or invalid, return "Invalid key".
+- If no key filename is provided: load default key and decipher content.
+- If key filename is provided: load from ciphers/ only; if unreadable or invalid, return "Invalid key".
 - Return output string to UI layer for printing.
 
 Error Handling

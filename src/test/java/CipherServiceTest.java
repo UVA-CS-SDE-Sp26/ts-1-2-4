@@ -60,12 +60,12 @@ class CipherServiceTest {
         String keyContent = "abc\nbcd";
 
         try {
-            when(reader.readFile("ciphers/alternate.txt")).thenReturn(keyContent);
+            when(reader.readFile("./ciphers/alternate.txt")).thenReturn(keyContent);
         } catch (IOException e) {
             fail(e);
         }
 
-        assertEquals(keyContent, service.loadKey("ciphers/alternate.txt"));
+        assertEquals(keyContent, service.loadKey("alternate.txt"));
     }
 
     @Test
@@ -75,9 +75,10 @@ class CipherServiceTest {
 
         assertNull(service.loadKey(null));
         assertNull(service.loadKey("   "));
+        assertNull(service.loadKey("ciphers/key.txt"));
 
         try {
-            when(reader.readFile("missing.txt")).thenThrow(new IOException("missing"));
+            when(reader.readFile("./ciphers/missing.txt")).thenThrow(new IOException("missing"));
         } catch (IOException e) {
             fail(e);
         }
@@ -90,7 +91,7 @@ class CipherServiceTest {
         CipherService service = new CipherService(reader);
 
         try {
-            when(reader.readFile("bad.txt")).thenReturn("abc\ncc");
+            when(reader.readFile("./ciphers/bad.txt")).thenReturn("abc\ncc");
         } catch (IOException e) {
             fail(e);
         }

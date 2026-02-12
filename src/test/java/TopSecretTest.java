@@ -104,12 +104,12 @@ class TopSecretTest {
         FakeProgramController fake = new FakeProgramController();
         TopSecret.setControllerForTests(fake);
 
-        TopSecret.main(new String[]{"1", "ciphers/key.txt"});
+        TopSecret.main(new String[]{"1", "key.txt"});
 
         assertEquals("FILE_CONTENT_1", outContent.toString().trim());
         assertEquals("1", fake.lastShowFileIndex);
         assertTrue(fake.lastKeyPath.isPresent());
-        assertEquals("ciphers/key.txt", fake.lastKeyPath.get());
+        assertEquals("key.txt", fake.lastKeyPath.get());
     }
 
     @Test

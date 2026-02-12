@@ -23,7 +23,7 @@ Core Classes And Members(Instance Variables and Methods)
   - ProgramController controller
 - ProgramController
   - listFiles(): String
-  - showFile(int index, Optional<String> keyPath): String
+  - showFile(int index, Optional<String> keyFilename): String
   - FileCatalog catalog
   - FileReaderService reader
   - CipherService cipher
@@ -38,7 +38,7 @@ Core Classes And Members(Instance Variables and Methods)
   - readFile(String path): String throws IOException
 - CipherService
   - loadKey(): String
-  - loadKey(String keyPath): String
+  - loadKey(String keyFilename): String
   - decrypt(String input, String keyContent): String
 - CipherKey
   - Map<Character, Character> mapping
@@ -46,22 +46,22 @@ Core Classes And Members(Instance Variables and Methods)
 
 Program Flow
 - No args: list files -> print numbered list -> exit.
-- With index: read file -> decipher using default key (or provided key path) -> print content -> exit.
+- With index: read file -> decipher using default key (or provided key filename) -> print content -> exit.
 
 Command Usage
 - java TopSecret
-- java TopSecret <fileNumber> [keyPath]
+- java TopSecret <fileNumber> [keyFilename]
 
 File/Folder Layout
 - data/ mission files. Resolved in this order: ./data, ./build/../data, data.
 - ciphers/key.txt default key file. Resolved in this order: ./ciphers/key.txt, ./build/../ciphers/key.txt, ciphers/key.txt.
-- Optional alternate key path: second command argument, e.g. ciphers/custom.txt.
+- Optional alternate key filename: second command argument, e.g. custom_key.txt.
 - docs/ (role documentation)
 
 Error Behavior
 - Missing or invalid mission file index: "File not found".
 - Invalid file number format: "Invalid file number".
-- Missing or invalid alternate key path (second argument): "Invalid key".
+- Missing or invalid alternate key filename (second argument): "Invalid key".
 - Missing data directory: warning on stderr, file list may be empty.
 - Decrypt runtime failure: "Decryption failed".
 

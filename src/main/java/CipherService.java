@@ -23,7 +23,11 @@ public class CipherService implements CipherServiceInterface {
         if (keyPath == null || keyPath.isBlank()) {
             return null;
         }
-        return readAndValidate(keyPath);
+        String resolved = resolveCustomKeyPath(keyPath.trim());
+        if (resolved == null) {
+            return null;
+        }
+        return readAndValidate(resolved);
     }
 
     public String decrypt(String input, String keyContent) {
@@ -64,6 +68,17 @@ public class CipherService implements CipherServiceInterface {
         }
 
         return DEFAULT_KEY_PATH;
+    }
+
+    private String resolveCustomKeyPath(String keyFilename) {
+        if (keyFilename.isEmpty()) {
+            return null;
+        }
+        if (keyFilename.contains("/") || keyFilename.contains("\\")) {
+            return null;
+        }
+
+        return "./ciphers/" + keyFilename;
     }
 
     private String readAndValidate(String path) {

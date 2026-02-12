@@ -2,6 +2,6 @@ package interfaces;
 
 public interface CipherServiceInterface {
     String loadKey();
-    String loadKey(String keyPath);
+    String loadKey(String keyFilename);
     String decrypt(String input, String keyContent);
 }

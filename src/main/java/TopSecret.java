@@ -14,7 +14,6 @@ public class TopSecret implements TopSecretInterface {
         controller = c;
     }
 
-    @Override
     public void run(String[] args) {
 
         // 0 args: list files
@@ -39,12 +38,12 @@ public class TopSecret implements TopSecretInterface {
             return;
         }
 
-        Optional<String> keyPath = Optional.empty();
+        Optional<String> keyFilename = Optional.empty();
         if (args.length == 2) {
-            keyPath = Optional.of(args[1]);
+            keyFilename = Optional.of(args[1]);
         }
 
-        System.out.println(controller.showFile(index, keyPath));
+        System.out.println(controller.showFile(index, keyFilename));
     }
 
     public static void main(String[] args) {

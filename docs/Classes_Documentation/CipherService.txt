@@ -10,25 +10,9 @@ class CipherService
     +CipherService()
     +CipherService(fileReader: FileReaderService)
     +loadKey(): String
-    +loadKey(keyPath: String): String
+    +loadKey(keyFilename: String): String
     +decrypt(input: String, keyContent: String): String
     -applyMapping(input: String, mapping: Map<Character, Character>): String
     -resolveDefaultKeyPath(): String
-    -readAndValidate(path: String): String
-Team: 2-4 TopSecret UML
-
-class CipherService
-    /*
-    Loads default or alternate key content, validates it, then decrypts text.
-    Uses FileReaderService for key file access.
-    */
-    -DEFAULT_KEY_PATH: String
-    -fileReader: FileReaderService
-    +CipherService()
-    +CipherService(fileReader: FileReaderService)
-    +loadKey(): String
-    +loadKey(keyPath: String): String
-    +decrypt(input: String, keyContent: String): String
-    -applyMapping(input: String, mapping: Map<Character, Character>): String
-    -resolveDefaultKeyPath(): String
+    -resolveCustomKeyPath(keyFilename: String): String
     -readAndValidate(path: String): String
