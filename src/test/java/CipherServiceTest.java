@@ -1,5 +1,8 @@
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
 
 class CipherServiceTest {
 
@@ -33,5 +36,64 @@ class CipherServiceTest {
         String output = service.decrypt(input, key);
 
         assertEquals("abc-xy\n", output);
+    }
+
+    @Test
+    void loadKey_defaultPathReturnsValidatedContent() {
+        FileReaderService reader = mock(FileReaderService.class);
+        CipherService service = new CipherService(reader);
+        String keyContent = "abc\nbcd";
+
+        try {
+            when(reader.readFile("./ciphers/key.txt")).thenReturn(keyContent);
+        } catch (IOException e) {
+            fail(e);
+        }
+
+        assertEquals(keyContent, service.loadKey());
+    }
+
+    @Test
+    void loadKey_customPathReturnsValidatedContent() {
+        FileReaderService reader = mock(FileReaderService.class);
+        CipherService service = new CipherService(reader);
+        String keyContent = "abc\nbcd";
+
+        try {
+            when(reader.readFile("ciphers/alternate.txt")).thenReturn(keyContent);
+        } catch (IOException e) {
+            fail(e);
+        }
+
+        assertEquals(keyContent, service.loadKey("ciphers/alternate.txt"));
+    }
+
+    @Test
+    void loadKey_customPathReturnsNullForNullBlankOrUnreadable() {
+        FileReaderService reader = mock(FileReaderService.class);
+        CipherService service = new CipherService(reader);
+
+        assertNull(service.loadKey(null));
+        assertNull(service.loadKey("   "));
+
+        try {
+            when(reader.readFile("missing.txt")).thenThrow(new IOException("missing"));
+        } catch (IOException e) {
+            fail(e);
+        }
+        assertNull(service.loadKey("missing.txt"));
+    }
+
+    @Test
+    void loadKey_returnsNullWhenKeyFormatIsInvalid() {
+        FileReaderService reader = mock(FileReaderService.class);
+        CipherService service = new CipherService(reader);
+
+        try {
+            when(reader.readFile("bad.txt")).thenReturn("abc\ncc");
+        } catch (IOException e) {
+            fail(e);
+        }
+        assertNull(service.loadKey("bad.txt"));
     }
 }

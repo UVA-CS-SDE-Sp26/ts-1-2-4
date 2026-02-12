@@ -62,13 +62,14 @@ Team Roles
 - Team D: Cipher decoding (if required).
 
 Architecture Overview
-- TopSecretApp parses args and delegates to ProgramController.
+- TopSecret parses args and delegates to ProgramController.
 - ProgramController requests file lists or contents from File Handler.
 - CipherService deciphers content when ciphering is enabled.
 - UI layer prints lists, file contents, or errors.
 
 Core Classes And Members(Instance Variables and Methods)
-- TopSecretApp
+- TopSecret
+  - run(String[] args)
   - main(String[] args)
   - ProgramController controller
 - ProgramController
@@ -84,8 +85,9 @@ Core Classes And Members(Instance Variables and Methods)
 - FileReaderService
   - readFile(String path): String
 - CipherService
-  - loadKey(String keyPath): CipherKey
-  - decipher(String input, CipherKey key): String
+  - loadKey(): String
+  - loadKey(String keyPath): String
+  - decrypt(String input, String keyContent): String
 - CipherKey
   - Map<Character, Character> mapping
   - validate(): boolean
@@ -95,8 +97,8 @@ Program Flow
 - With index: read file -> optional decipher -> print content -> exit.
 
 Command Usage
-- java topsecret
-- java topsecret <fileNumber> [keyPath]
+- java TopSecret
+- java TopSecret <fileNumber> [keyPath]
 
 File/Folder Layout
 - data/ (mission files)

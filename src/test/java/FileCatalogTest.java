@@ -52,6 +52,19 @@ class FileCatalogTest {
     }
 
     @Test
+    void listFiles_refreshesWhenNewFileAppears() throws IOException {
+        List<String> initial = fileCatalog.listFiles();
+        assertEquals(3, initial.size());
+
+        Path dataPath = Paths.get(TEST_DATA_DIR);
+        Files.writeString(dataPath.resolve("delta.txt"), "Content of Delta");
+
+        List<String> updated = fileCatalog.listFiles();
+        assertEquals(4, updated.size());
+        assertTrue(updated.contains("delta.txt"));
+    }
+
+    @Test
     void getByIndex() {
         Optional<String> result1 = fileCatalog.getByIndex(1);
         assertTrue(result1.isPresent());
@@ -69,6 +82,12 @@ class FileCatalogTest {
     }
 
     @Test
+    void getByIndex_returnsEmptyWhenCalledWithNegativeIndex() {
+        Optional<String> result = fileCatalog.getByIndex(-1);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void getByName() {
         Optional<String> result = fileCatalog.getByName("gamma.txt");
         assertTrue(result.isPresent());
@@ -79,5 +98,33 @@ class FileCatalogTest {
 
         Optional<String> resultDir = fileCatalog.getByName(".");
         assertFalse(resultDir.isPresent());
+    }
+
+    @Test
+    void listFiles_ignoresDirectoriesAndHiddenFiles() throws IOException {
+        Path dataPath = Paths.get(TEST_DATA_DIR);
+        Files.createDirectories(dataPath.resolve("nested"));
+        Files.writeString(dataPath.resolve(".hidden.txt"), "secret");
+
+        List<String> files = fileCatalog.listFiles();
+
+        assertFalse(files.contains("nested"));
+        assertFalse(files.contains(".hidden.txt"));
+    }
+
+    @Test
+    void missingDataDirectory_printsWarningAndReturnsEmptyList() throws IOException {
+        tearDown();
+
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalErr = System.err;
+        System.setErr(new PrintStream(errContent));
+        try {
+            FileCatalog missingCatalog = new FileCatalog();
+            assertTrue(missingCatalog.listFiles().isEmpty());
+            assertTrue(errContent.toString().contains("Could not locate 'data' directory."));
+        } finally {
+            System.setErr(originalErr);
+        }
     }
 }

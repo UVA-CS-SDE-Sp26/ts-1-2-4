@@ -1,8 +1,9 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import interfaces.CipherServiceInterface;
 
-public class CipherService {
+public class CipherService implements CipherServiceInterface {
     private static final String DEFAULT_KEY_PATH = "ciphers/key.txt";
     private final FileReaderService fileReader;
 
@@ -19,14 +20,10 @@ public class CipherService {
     }
 
     public String loadKey(String keyPath) {
-        String content = null;
-        if (keyPath != null && !keyPath.isBlank()) {
-            content = readAndValidate(keyPath);
+        if (keyPath == null || keyPath.isBlank()) {
+            return null;
         }
-        if (content == null) {
-            content = readAndValidate(resolveDefaultKeyPath());
-        }
-        return content;
+        return readAndValidate(keyPath);
     }
 
     public String decrypt(String input, String keyContent) {

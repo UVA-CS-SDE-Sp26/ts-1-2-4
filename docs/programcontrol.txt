@@ -16,7 +16,7 @@ Outputs
 - File contents (plain or deciphered).
 - User‑friendly error messages.
 
-Interface (proposed)
+Interface
 - class ProgramController
   - String listFiles()
   - String showFile(int index, Optional<String> keyPath)
@@ -27,18 +27,20 @@ Interface (proposed)
 Behavior
 - If no args: request listFiles() from File Handler and format numbered list.
 - If fileNumber provided: fetch file by index, read contents.
-- If ciphering enabled: load key (default or provided) and decipher content.
+- If no key path is provided: load default key and decipher content.
+- If key path is provided: load that exact key path; if unreadable or invalid, return "Invalid key".
 - Return output string to UI layer for printing.
 
 Error Handling
-- If file list is empty: return "No files available".
-- If index invalid: return "Invalid file number".
-- If file read fails: return "Unable to read file".
+- If file list is empty: return "No files found.".
+- If index invalid: return "File not found".
+- If file read fails or file cannot be resolved: return "File not found".
 - If cipher key invalid or missing: return "Invalid key".
+- If cipher throws unexpectedly: return "Decryption failed".
 
 Testing Ideas (TDD)
 - No args returns numbered list from File Handler.
-- Empty file list returns "No files available".
+- Empty file list returns "No files found.".
 - Invalid index returns error message.
 - Valid index returns file content.
 - Cipher enabled with valid key returns deciphered text.

@@ -1,6 +1,7 @@
 import java.util.Optional;
+import interfaces.TopSecretInterface;
 
-public class TopSecret {
+public class TopSecret implements TopSecretInterface {
 
     private static ProgramController controller = new ProgramController(
             new FileCatalog(),
@@ -13,7 +14,8 @@ public class TopSecret {
         controller = c;
     }
 
-    public static void main(String[] args) {
+    @Override
+    public void run(String[] args) {
 
         // 0 args: list files
         if (args.length == 0) {
@@ -43,5 +45,9 @@ public class TopSecret {
         }
 
         System.out.println(controller.showFile(index, keyPath));
+    }
+
+    public static void main(String[] args) {
+        new TopSecret().run(args);
     }
 }

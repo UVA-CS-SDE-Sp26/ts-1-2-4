@@ -1,1 +1,13 @@
-i
+Team: 2-4 TopSecret UML
+
+class CipherKey
+    /*
+    Parses 2-line key content and builds a cipher->plain mapping.
+    Validates key format and uniqueness constraints.
+    */
+    -mapping: Map<Character, Character>
+    -parseError: boolean
+    +CipherKey(content: String)
+    -parse(content: String): void
+    +validate(): boolean
+    +getMapping(): Map<Character, Character>

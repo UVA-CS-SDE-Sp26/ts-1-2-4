@@ -37,6 +37,9 @@ public class ProgramController implements ProgramControllerInterface {
         }
         String content = fileContent.get();
         String key = keyPath.isPresent() ? cipher.loadKey(keyPath.get()) : cipher.loadKey();
+        if (key == null) {
+            return "Invalid key";
+        }
         try {
             return cipher.decrypt(content, key);
         } catch (Exception e) {

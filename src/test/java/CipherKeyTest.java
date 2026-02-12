@@ -56,4 +56,12 @@ class CipherKeyTest {
         CipherKey key = new CipherKey("\nabc\nbcd\n");
         assertTrue(key.validate());
     }
+
+    @Test
+    void getMapping_isUnmodifiableView() {
+        CipherKey key = new CipherKey("abc\nbcd");
+        Map<Character, Character> mapping = key.getMapping();
+
+        assertThrows(UnsupportedOperationException.class, () -> mapping.put('x', 'y'));
+    }
 }

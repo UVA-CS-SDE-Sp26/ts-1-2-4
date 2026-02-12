@@ -13,8 +13,9 @@ Outputs
 - File contents (plain or deciphered).
 - User‑friendly error messages.
 
-Interface (proposed)
+Interface
 - class TopSecret
+  - run(String[] args)
   - main(String[] args)
   - ProgramController controller
   
@@ -28,8 +29,7 @@ Behavior
 Error Handling
 - If arg count invalid: print "Too many arguments".
 - If file number invalid format: print "Invalid file number".
-- If file number out of range: print "File number not found".
-- If file cannot be read: print "Unable to read file".
+- If file number out of range or file cannot be resolved: print "File not found".
 - If cipher key invalid or missing: print "Invalid key".
 
 Testing Ideas (TDD)
@@ -38,3 +38,4 @@ Testing Ideas (TDD)
 - Two args uses alternate key path.
 - Invalid number format prints error.
 - Too many args prints error.
+- Negative or non-standard numeric argument is still passed to ProgramController.

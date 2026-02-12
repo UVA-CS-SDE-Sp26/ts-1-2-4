@@ -1,0 +1,19 @@
+Team: 2-4 TopSecret UML
+
+class ProgramController
+    /*
+    Coordinates listing files and showing one file's deciphered content.
+    Delegates file reads to FileCatalog and key/decrypt work to CipherService.
+    */
+    -catalog: FileCatalog
+    -reader: FileReaderService
+    -cipher: CipherService
+    +ProgramController(catalog: FileCatalog, reader: FileReaderService, cipher: CipherService)
+    +listFiles(): String
+    +showFile(index: int, keyPath: Optional<String>): String
+    +getCatalog(): FileCatalog
+    +setCatalog(catalog: FileCatalog): void
+    +getReader(): FileReaderService
+    +setReader(reader: FileReaderService): void
+    +getCipher(): CipherService
+    +setCipher(cipher: CipherService): void

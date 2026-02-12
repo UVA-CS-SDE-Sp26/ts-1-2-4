@@ -1,7 +1,7 @@
 File Handler Plan (Team B)
 
 Responsibility
-- Own all direct file system access for data files.
+- Own all direct file system access for mission data files.
 - Provide program control a clean API: list available files and return contents.
 - Keep data folder location flexible (project root /data or working‑dir /data).
 
@@ -13,7 +13,7 @@ Outputs
 - Sorted list of filenames.
 - Raw file contents as a String (via Optional).
 
-Interface (proposed)
+Interface
 - class FileCatalog
   - List<String> listFiles()
   - Optional<String> getByIndex(int index)
@@ -38,6 +38,10 @@ Error Handling
 - If data directory missing: print a warning; listFiles() may return empty.
 - If file cannot be read: log to stderr in FileCatalog and return Optional.empty().
 - FileReaderService throws IOException for missing paths or directories.
+
+Storage Notes
+- Mission text files are expected in the `data/` directory at project root.
+- The path resolution order allows running from IDE, command line, or Gradle without hardcoded absolute paths.
 
 Testing Ideas (TDD)
 - listFiles() on empty data dir returns empty list.

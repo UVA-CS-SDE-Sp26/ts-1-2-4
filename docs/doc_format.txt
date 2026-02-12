@@ -65,15 +65,15 @@ Outputs
 Interface (proposed)
 - class ProgramController
   - String listFiles()
-  - String showFile(int index, Optional<Path> keyPath)
+  - String showFile(int index, Optional<String> keyPath)
 
 Behavior
 - If no args: list files and return numbered list.
 - If index provided: fetch file, optionally decipher, return content.
 
 Error Handling
-- If index invalid: return "Invalid file number".
-- If file read fails: return "Unable to read file".
+- If index invalid: return "File not found".
+- If file read fails: return "File not found".
 - If cipher key invalid: return "Invalid key".
 
 Testing Ideas (TDD)

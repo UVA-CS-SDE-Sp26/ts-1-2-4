@@ -131,4 +131,16 @@ class TopSecretTest {
 
         assertEquals("Invalid file number", outContent.toString().trim());
     }
+
+    @Test
+    void run_acceptsNegativeNumberAndDelegatesToController() {
+        FakeProgramController fake = new FakeProgramController();
+        TopSecret.setControllerForTests(fake);
+
+        TopSecret app = new TopSecret();
+        app.run(new String[]{"-1"});
+
+        assertEquals("FILE_CONTENT_-1", outContent.toString().trim());
+        assertEquals("-1", fake.lastShowFileIndex);
+    }
 }

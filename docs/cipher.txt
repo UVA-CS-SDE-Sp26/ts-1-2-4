@@ -16,16 +16,17 @@ Inputs
 
 Outputs
 
-- CipherKey object with mapping when key is valid.
+- Validated key file content as String when key is valid.
 - Deciphered text as a String when ciphering is enabled and key is valid.
 - User-friendly error strings (or error signals) when key is invalid or decipher fails.
 
-Interface (proposed)
+Interface
 
 - class CipherService
 
-  - CipherKey loadKey(String keyPath)
-  - String decipher(String input, CipherKey key)
+  - String loadKey()
+  - String loadKey(String keyPath)
+  - String decrypt(String input, String keyContent)
 - class CipherKey
 
   - Map<Character, Character> mapping
@@ -35,16 +36,17 @@ Behavior
 
 - If ProgramController requests deciphering:
 
-  - Determine keyPath (use provided path if present, else default key path).
-  - Load key content (ProgramController uses FileReaderService; CipherService parses).
+  - If no key path is provided, resolve default key in this order:
+    ./ciphers/key.txt, ./build/../ciphers/key.txt, ciphers/key.txt.
+  - If key path is provided, attempt that exact location only.
+  - Load key content (CipherService uses FileReaderService).
   - Parse key content into mapping pairs (character-to-character).
-  - Build CipherKey and call validate().
-  - If valid: return CipherKey to ProgramController.
-- When decipher(input, key) is called:
+  - Build CipherKey and call validate(); if valid, return key content; if invalid, return null.
+- When decrypt(input, keyContent) is called:
 
   - For each character in input:
 
-    - If character exists in key.mapping: replace using mapped value.
+    - If character exists in key mapping: replace using mapped value.
     - Else: keep character unchanged (spaces, punctuation, newlines).
   - Return the transformed (deciphered) output string.
 
@@ -53,14 +55,14 @@ Error Handling
 - Missing key file / unreadable key content: surface "Invalid key".
 - Key format invalid (unparseable lines, missing delimiter, empty mapping): "Invalid key".
 - Key validation fails (duplicate outputs, conflicting mappings, incomplete rules): "Invalid key".
-- Null/empty input to decipher: return empty string (no error).
-- If CipherKey is null or not validated before decipher: surface "Invalid key".
+- Null/empty input to decrypt: return empty string (no error).
+- If keyContent is null or not validated before decrypt: return "Invalid key".
 
 Testing Ideas (TDD)
 
-- loadKey with default key path returns a validated CipherKey.
+- loadKey with default key path returns validated key content.
 - loadKey with a bad path or unreadable content results in "Invalid key".
 - loadKey rejects malformed key content (bad lines / missing pairs) with "Invalid key".
 - CipherKey.validate fails when mapping has duplicates or conflicts.
-- decipher replaces mapped letters and preserves punctuation/newlines unchanged.
-- decipher with valid key produces expected plaintext for a known ciphertext sample.
+- decrypt replaces mapped letters and preserves punctuation/newlines unchanged.
+- decrypt with valid key produces expected plaintext for a known ciphertext sample.

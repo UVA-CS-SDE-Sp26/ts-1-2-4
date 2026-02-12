@@ -11,13 +11,14 @@ Team Roles
 - Team D: Cipher decoding and key validation (teams of four).
 
 Architecture Overview
-- TopSecretApp parses args and delegates to ProgramController.
+- TopSecret parses args and delegates to ProgramController.
 - ProgramController requests file lists or contents from File Handler.
 - CipherService deciphers content when ciphering is enabled.
 - UI prints lists, file contents, or errors and exits.
 
 Core Classes And Members(Instance Variables and Methods)
-- TopSecretApp
+- TopSecret
+  - run(String[] args)
   - main(String[] args)
   - ProgramController controller
 - ProgramController
@@ -36,26 +37,36 @@ Core Classes And Members(Instance Variables and Methods)
 - FileReaderService
   - readFile(String path): String throws IOException
 - CipherService
-  - loadKey(String keyPath): CipherKey
-  - decipher(String input, CipherKey key): String
+  - loadKey(): String
+  - loadKey(String keyPath): String
+  - decrypt(String input, String keyContent): String
 - CipherKey
   - Map<Character, Character> mapping
   - validate(): boolean
 
 Program Flow
 - No args: list files -> print numbered list -> exit.
-- With index: read file -> optional decipher -> print content -> exit.
+- With index: read file -> decipher using default key (or provided key path) -> print content -> exit.
 
 Command Usage
-- java topsecret
-- java topsecret <fileNumber> [keyPath]
+- java TopSecret
+- java TopSecret <fileNumber> [keyPath]
 
 File/Folder Layout
-- data/ (mission files)
-- ciphers/key.txt (cipher key)
+- data/ mission files. Resolved in this order: ./data, ./build/../data, data.
+- ciphers/key.txt default key file. Resolved in this order: ./ciphers/key.txt, ./build/../ciphers/key.txt, ciphers/key.txt.
+- Optional alternate key path: second command argument, e.g. ciphers/custom.txt.
 - docs/ (role documentation)
 
+Error Behavior
+- Missing or invalid mission file index: "File not found".
+- Invalid file number format: "Invalid file number".
+- Missing or invalid alternate key path (second argument): "Invalid key".
+- Missing data directory: warning on stderr, file list may be empty.
+- Decrypt runtime failure: "Decryption failed".
+
 Testing Approach (TDD)
-- Unit tests for file listing and file reading.
-- Unit tests for cipher validation and decoding.
-- Integration test for CLI end‑to‑end flow.
+- Unit tests cover non-getter/setter methods in TopSecret, ProgramController, FileCatalog,
+  FileReaderService, CipherService, and CipherKey.
+- Includes normal, edge, and failure path tests.
+- Includes Mockito-based tests in ProgramController and CipherService tests.
